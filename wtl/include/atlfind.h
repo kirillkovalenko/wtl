@@ -826,10 +826,17 @@ public:
 		{
 			T* pThisNoConst = const_cast<T*>(pT);
 
+#ifdef _versionhelpers_H_INCLUDED_
+			OSVERSIONINFOEX ovi = { sizeof(OSVERSIONINFOEX) };
+			ovi.dwPlatformId = VER_PLATFORM_WIN32_WINDOWS;
+			DWORDLONG const dwlConditionMask = ::VerSetConditionMask(0, VER_PLATFORMID, VER_EQUAL);
+			bool bWin9x = (::VerifyVersionInfo(&ovi, VER_PLATFORMID, dwlConditionMask) != FALSE);
+#else // !_versionhelpers_H_INCLUDED_
 			OSVERSIONINFO ovi = { sizeof(OSVERSIONINFO) };
 			::GetVersionEx(&ovi);
 
 			bool bWin9x = (ovi.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS);
+#endif // _versionhelpers_H_INCLUDED_
 			if(bWin9x)
 			{
 				// Windows 95, 98, ME
@@ -851,7 +858,11 @@ public:
 				// Using a shadow buffer uses GetWindowText instead, so it solves
 				// this problem for us (although it makes it a little less efficient).
 
-				if((ovi.dwMajorVersion == 5 && ovi.dwMinorVersion >= 1) || (ovi.dwMajorVersion > 5))
+#ifdef _versionhelpers_H_INCLUDED_
+				if(::IsWindowsXPOrGreater())
+#else // !_versionhelpers_H_INCLUDED_
+				if ((ovi.dwMajorVersion == 5 && ovi.dwMinorVersion >= 1) || (ovi.dwMajorVersion > 5))
+#endif // _versionhelpers_H_INCLUDED_
 				{
 					// We use DLLVERSIONINFO_private so we don't have to depend on shlwapi.h
 					typedef struct _DLLVERSIONINFO_private

@@ -2987,11 +2987,17 @@ public:
 		dc.SelectFont(hFontOld);
 
 		// get Windows version
+#ifndef _versionhelpers_H_INCLUDED_
 		OSVERSIONINFO ovi = { sizeof(OSVERSIONINFO) };
 		::GetVersionEx(&ovi);
+#endif // !_versionhelpers_H_INCLUDED_
 
 		// query keyboard cues mode (Windows 2000 or later)
-		if(ovi.dwMajorVersion >= 5)
+#ifdef _versionhelpers_H_INCLUDED_
+		if(::IsWindowsVersionOrGreater(5, 0, 0))
+#else // !_versionhelpers_H_INCLUDED_
+		if (ovi.dwMajorVersion >= 5)
+#endif // _versionhelpers_H_INCLUDED_
 		{
 #ifndef SPI_GETKEYBOARDCUES
 			const UINT SPI_GETKEYBOARDCUES = 0x100A;
@@ -3004,7 +3010,11 @@ public:
 		}
 
 		// query flat menu mode (Windows XP or later)
-		if((ovi.dwMajorVersion == 5 && ovi.dwMinorVersion >= 1) || (ovi.dwMajorVersion > 5))
+#ifdef _versionhelpers_H_INCLUDED_
+		if(::IsWindowsXPOrGreater())
+#else // !_versionhelpers_H_INCLUDED_
+		if ((ovi.dwMajorVersion == 5 && ovi.dwMinorVersion >= 1) || (ovi.dwMajorVersion > 5))
+#endif // _versionhelpers_H_INCLUDED_
 		{
 #ifndef SPI_GETFLATMENU
 			const UINT SPI_GETFLATMENU = 0x1022;

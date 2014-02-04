@@ -481,9 +481,16 @@ public:
 		m_ofn.Flags |= OFN_ALLOWMULTISELECT;   // Force multiple selection mode
 
 #ifndef _UNICODE
+#ifdef _versionhelpers_H_INCLUDED_
+		OSVERSIONINFOEX ovi = { sizeof(OSVERSIONINFOEX) };
+		ovi.dwPlatformId = VER_PLATFORM_WIN32_NT;
+		DWORDLONG const dwlConditionMask = ::VerSetConditionMask(0, VER_PLATFORMID, VER_EQUAL);
+		m_bIsNT = (::VerifyVersionInfo(&ovi, VER_PLATFORMID, dwlConditionMask) != FALSE);
+#else // !_versionhelpers_H_INCLUDED_
 		OSVERSIONINFO ovi = { sizeof(OSVERSIONINFO) };
 		::GetVersionEx(&ovi);
 		m_bIsNT = (ovi.dwPlatformId == VER_PLATFORM_WIN32_NT);
+#endif // _versionhelpers_H_INCLUDED_
 		if (m_bIsNT)
 		{
 			// On NT platforms, GetOpenFileNameA thunks to GetOpenFileNameW and there 
