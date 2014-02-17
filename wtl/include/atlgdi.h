@@ -1982,7 +1982,7 @@ public:
 	}
 #endif // !_WIN32_WCE
 
-	BOOL Polyline(LPPOINT lpPoints, int nCount)
+	BOOL Polyline(const POINT* lpPoints, int nCount)
 	{
 		ATLASSERT(m_hDC != NULL);
 		return ::Polyline(m_hDC, lpPoints, nCount);
@@ -2190,14 +2190,14 @@ public:
 	}
 #endif // !_WIN32_WCE
 
-	BOOL Polygon(LPPOINT lpPoints, int nCount)
+	BOOL Polygon(const POINT* lpPoints, int nCount)
 	{
 		ATLASSERT(m_hDC != NULL);
 		return ::Polygon(m_hDC, lpPoints, nCount);
 	}
 
 #ifndef _WIN32_WCE
-	BOOL PolyPolygon(LPPOINT lpPoints, LPINT lpPolyCounts, int nCount)
+	BOOL PolyPolygon(const POINT* lpPoints, const INT* lpPolyCounts, int nCount)
 	{
 		ATLASSERT(m_hDC != NULL);
 		return ::PolyPolygon(m_hDC, lpPoints, lpPolyCounts, nCount);
