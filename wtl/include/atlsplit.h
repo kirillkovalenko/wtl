@@ -454,15 +454,25 @@ public:
 		return 1;
 	}
 
-	LRESULT OnPaint(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
+	LRESULT OnPaint(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& /*bHandled*/)
 	{
 		T* pT = static_cast<T*>(this);
+
 		// try setting position if not set
 		if(m_nSinglePane == SPLIT_PANE_NONE && m_xySplitterPos == -1)
 			pT->SetSplitterPos();
+
 		// do painting
-		CPaintDC dc(pT->m_hWnd);
-		pT->DrawSplitter(dc.m_hDC);
+		if(wParam != NULL)
+		{
+			pT->DrawSplitter((HDC)wParam);
+		}
+		else
+		{
+			CPaintDC dc(pT->m_hWnd);
+			pT->DrawSplitter(dc.m_hDC);
+		}
+
 		return 0;
 	}
 
