@@ -939,6 +939,16 @@ public: \
 			return TRUE; \
 	}
 
+// BOOL OnMouseHWheel(UINT nFlags, short zDelta, CPoint pt)
+#define MSG_WM_MOUSEHWHEEL(func) \
+	if (uMsg == WM_MOUSEHWHEEL) \
+	{ \
+		SetMsgHandled(TRUE); \
+		lResult = (LRESULT)func((UINT)LOWORD(wParam), (short)HIWORD(wParam), _WTYPES_NS::CPoint(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam))); \
+		if(IsMsgHandled()) \
+			return TRUE; \
+	}
+
 // void OnLButtonDown(UINT nFlags, CPoint point)
 #define MSG_WM_LBUTTONDOWN(func) \
 	if (uMsg == WM_LBUTTONDOWN) \
