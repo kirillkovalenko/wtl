@@ -53,7 +53,8 @@ namespace WTL
 #define SPLIT_FIXEDBARSIZE		0x00000010
 
 // Note: SPLIT_PROPORTIONAL and SPLIT_RIGHTALIGNED/SPLIT_BOTTOMALIGNED are 
-// mutually exclusive. If both are set, splitter defaults to SPLIT_PROPORTIONAL
+// mutually exclusive. If both are set, splitter defaults to SPLIT_PROPORTIONAL.
+// SPLIT_GRADIENTBAR doesn't wotk with _ATL_NO_MSIMG
 
 
 template <class T, bool t_bVertical = true>
@@ -389,7 +390,7 @@ public:
 		{
 			dc.FillRect(&rect, COLOR_3DFACE);
 
-#if (!defined(_WIN32_WCE) || (_WIN32_WCE >= 420))
+#if !defined(_ATL_NO_MSIMG) || (_WIN32_WCE >= 420)
 			if((m_dwExtendedStyle & SPLIT_GRADIENTBAR) != 0)
 			{
 				RECT rect2 = rect;
@@ -400,7 +401,7 @@ public:
 
 				dc.GradientFillRect(rect2, ::GetSysColor(COLOR_3DFACE), ::GetSysColor(COLOR_3DSHADOW), t_bVertical);
 			}
-#endif // !defined(_WIN32_WCE) || (_WIN32_WCE >= 420)
+#endif // !defined(_ATL_NO_MSIMG) || (_WIN32_WCE >= 420)
 
 			// draw 3D edge if needed
 			T* pT = static_cast<T*>(this);
