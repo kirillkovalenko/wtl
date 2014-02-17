@@ -3029,12 +3029,12 @@ typedef struct
 
 // Control map macros
 #define BEGIN_RIBBON_CONTROL_MAP(theClass) \
-	RibbonUI::ICtrl& GetRibbonCtrl(UINT id) \
+	WTL::RibbonUI::ICtrl& GetRibbonCtrl(UINT id) \
 	{ \
-		RibbonUI::_ribbonCtrl _ctrls[] = \
+		WTL::RibbonUI::_ribbonCtrl _ctrls[] = \
 		{
 
-#define RIBBON_CONTROL(member) {member.GetID(), static_cast<RibbonUI::ICtrl&>(member)},
+#define RIBBON_CONTROL(member) {member.GetID(), static_cast<WTL::RibbonUI::ICtrl&>(member)},
 
 #define END_RIBBON_CONTROL_MAP() \
 		{0, *this} \
