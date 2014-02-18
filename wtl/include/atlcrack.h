@@ -1846,7 +1846,7 @@ public: \
 			return TRUE; \
 	}
 
-// OnThemeChanged()
+// void OnThemeChanged()
 #define MSG_WM_THEMECHANGED(func) \
 	if (uMsg == WM_THEMECHANGED) \
 	{ \
