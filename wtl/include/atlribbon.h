@@ -891,7 +891,7 @@ public:
 	}
 
 	UINT32 m_auItemCat[t_items];
-	Text m_asCatName[max(t_categories, 1)];
+	Text m_asCatName[__max(t_categories, 1)];
 	size_t m_size;
 
 // Operations

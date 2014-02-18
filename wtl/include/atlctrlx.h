@@ -943,7 +943,7 @@ public:
 		RECT rcLink = rect;
 		dc.DrawText(_T("NS"), -1, &rcLink, DT_LEFT | uFormat | DT_CALCRECT);
 		dc.SelectFont(hFontOld);
-		return max(rcText.bottom - rcText.top, rcLink.bottom - rcLink.top);
+		return __max(rcText.bottom - rcText.top, rcLink.bottom - rcLink.top);
 	}
 
 	bool GetIdealSize(SIZE& size) const
@@ -1001,7 +1001,7 @@ public:
 
 			dc.SelectFont(hFontOld);
 
-			int cyMax = max(rcLeft.bottom, max(rcLink.bottom, rcRight.bottom));
+			int cyMax = __max(rcLeft.bottom, __max(rcLink.bottom, rcRight.bottom));
 			::SetRect(&rcAll, rcLeft.left, rcLeft.top, rcRight.right, cyMax);
 		}
 		else
@@ -2724,7 +2724,7 @@ public:
 		{
 			int cyFont = abs(lf.lfHeight) + m_cxyBorder + 2 * m_cxyTextOffset;
 			int cyBtn = m_cyImageTB + m_cxyBtnAddTB + m_cxyBorder + 2 * m_cxyBtnOffset;
-			m_cxyHeader = max(cyFont, cyBtn);
+			m_cxyHeader = __max(cyFont, cyBtn);
 		}
 	}
 
@@ -4305,7 +4305,7 @@ public:
 		{
 			// Append menu items for all pages
 			const int cchPrefix = 3;   // 2 digits + space
-			nMenuItemsCount = min(min(nPageCount, nMenuItemsCount), (int)m_nMenuItemsMax);
+			nMenuItemsCount = __min(__min(nPageCount, nMenuItemsCount), (int)m_nMenuItemsMax);
 			ATLASSERT(nMenuItemsCount < 100);   // 2 digits only
 			if(nMenuItemsCount >= 100)
 				nMenuItemsCount = 99;
