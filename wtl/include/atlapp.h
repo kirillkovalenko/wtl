@@ -602,6 +602,10 @@ inline BOOL AtlInitCommonControls(DWORD dwFlags)
   #define NONCLIENTMETRICS_V1_SIZE   _SIZEOF_STRUCT(NONCLIENTMETRICS, lfMessageFont)
 #endif // !defined(_WIN32_WCE) && (WINVER >= 0x0600) && !defined(NONCLIENTMETRICS_V1_SIZE)
 
+#if !defined(_WIN32_WCE) && (_WIN32_WINNT >= 0x0501) && !defined(TTTOOLINFO_V2_SIZE)
+  #define TTTOOLINFO_V2_SIZE   _SIZEOF_STRUCT(TTTOOLINFO, lParam)
+#endif // !defined(_WIN32_WCE) && (_WIN32_WINNT >= 0x0501) && !defined(TTTOOLINFO_V2_SIZE)
+
 #endif // !_WTL_NO_RUNTIME_STRUCT_SIZE
 
 namespace RunTimeHelper
@@ -744,6 +748,16 @@ namespace RunTimeHelper
 		if(!IsVista())
 			nSize = NONCLIENTMETRICS_V1_SIZE;
 #endif // !defined(_WTL_NO_RUNTIME_STRUCT_SIZE) && (WINVER >= 0x0600)
+		return nSize;
+	}
+
+	inline int SizeOf_TOOLINFO()
+	{
+		int nSize = sizeof(TOOLINFO);
+#if !defined(_WTL_NO_RUNTIME_STRUCT_SIZE) && (_WIN32_WINNT >= 0x0501)
+		if(!IsVista())
+			nSize = TTTOOLINFO_V2_SIZE;
+#endif // !defined(_WTL_NO_RUNTIME_STRUCT_SIZE) && (_WIN32_WINNT >= 0x0501)
 		return nSize;
 	}
 #endif // !_WIN32_WCE

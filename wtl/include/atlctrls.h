@@ -2215,7 +2215,7 @@ public:
 	{
 		ATLASSERT(::IsWindow(hWnd));
 		memset(this, 0, sizeof(TOOLINFO));
-		cbSize = sizeof(TOOLINFO);
+		cbSize = sizeof(RunTimeHelper::SizeOf_TOOLINFO());
 		uFlags = nFlags;
 		if(nIDTool == 0)
 		{
@@ -2475,7 +2475,7 @@ public:
 		ATLASSERT(lpToolInfo != NULL);
 
 		TTHITTESTINFO hti = { 0 };
-		hti.ti.cbSize = sizeof(TOOLINFO);
+		hti.ti.cbSize = sizeof(RunTimeHelper::SizeOf_TOOLINFO());
 		hti.hwnd = hWnd;
 		hti.pt.x = pt.x;
 		hti.pt.y = pt.y;
