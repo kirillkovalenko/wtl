@@ -2770,9 +2770,9 @@ public:
 		dc.SetBkMode(TRANSPARENT);
 		T* pT = static_cast<T*>(this);
 		HFONT hFontOld = dc.SelectFont(pT->GetTitleFont());
-#ifdef _WIN32_WCE
+#if defined(_WIN32_WCE) && !defined(DT_END_ELLIPSIS)
 		const UINT DT_END_ELLIPSIS = 0;
-#endif // _WIN32_WCE
+#endif // defined(_WIN32_WCE) && !defined(DT_END_ELLIPSIS)
 
 		if(IsVertical())
 		{
