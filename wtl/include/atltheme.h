@@ -221,7 +221,7 @@ public:
 		return ::GetThemeBackgroundExtent(m_hTheme, hDC, nPartID, nStateID, pContentRect, pExtentRect);
 	}
 
-	HRESULT GetThemePartSize(HDC hDC, int nPartID, int nStateID, LPRECT pRect, enum THEMESIZE eSize, LPSIZE pSize) const
+	HRESULT GetThemePartSize(HDC hDC, int nPartID, int nStateID, LPCRECT pRect, enum THEMESIZE eSize, LPSIZE pSize) const
 	{
 		ATLASSERT(m_hTheme != NULL);
 		return ::GetThemePartSize(m_hTheme, hDC, nPartID, nStateID, pRect, eSize, pSize);
