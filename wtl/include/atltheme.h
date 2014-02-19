@@ -1051,6 +1051,11 @@ public:
 	{
 		return (::BufferedPaintRenderAnimation(hWnd, hDC) != FALSE);
 	}
+
+	static HRESULT StopAllAnimations(HWND hWnd)
+	{
+		return ::BufferedPaintStopAllAnimations(hWnd);
+	}
 };
 
 
