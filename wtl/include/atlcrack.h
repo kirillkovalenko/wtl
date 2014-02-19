@@ -1325,12 +1325,12 @@ public: \
 			return TRUE; \
 	}
 
-// BOOL OnDeviceChange(UINT nEventType, DWORD dwData)
+// BOOL OnDeviceChange(UINT nEventType, DEV_BROADCAST_HDR* pHdr)
 #define MSG_WM_DEVICECHANGE(func) \
 	if (uMsg == WM_DEVICECHANGE) \
 	{ \
 		SetMsgHandled(TRUE); \
-		lResult = (LRESULT)func((UINT)wParam, (DWORD)lParam); \
+		lResult = (LRESULT)func((UINT)wParam, (DEV_BROADCAST_HDR*)lParam); \
 		if(IsMsgHandled()) \
 			return TRUE; \
 	}
