@@ -1922,6 +1922,7 @@ public:
 		return ERROR_SUCCESS;
 	}
 
+#ifndef _WIN32_WCE
 	LONG QueryQWORDValue(LPCTSTR pszValueName, ULONGLONG& qwValue)
 	{
 		ATLASSERT(m_hKey != NULL);
@@ -1936,6 +1937,7 @@ public:
 
 		return ERROR_SUCCESS;
 	}
+#endif
 
 	LONG QueryStringValue(LPCTSTR pszValueName, LPTSTR pszValue, ULONG* pnChars)
 	{
