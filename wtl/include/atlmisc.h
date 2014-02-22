@@ -3062,7 +3062,7 @@ public:
 		}
 
 		// delete unused keys
-		for(nItem = m_arrDocs.GetSize() + 1; nItem < m_nMaxEntries_Max; nItem++)
+		for(nItem = m_arrDocs.GetSize() + 1; nItem <= m_nMaxEntries_Max; nItem++)
 		{
 			TCHAR szBuff[m_cchItemNameLen] = { 0 };
 			SecureHelper::wsprintf_x(szBuff, m_cchItemNameLen, pT->GetRegItemName(), nItem);
