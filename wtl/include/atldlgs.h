@@ -777,7 +777,11 @@ public:
 		
 		// Get the ID-list of the current folder.
 		int nBytes = GetFolderIDList(NULL, 0);
+#ifdef STRICT_TYPED_ITEMIDS
+		CTempBuffer<ITEMIDLIST_RELATIVE> idlist;
+#else
 		CTempBuffer<ITEMIDLIST> idlist;
+#endif
 		idlist.AllocateBytes(nBytes);
 		if ((nBytes <= 0) || (GetFolderIDList(idlist, nBytes) <= 0))
 			return;
@@ -820,7 +824,11 @@ public:
 					int nFileNameLength = (int)(DWORD_PTR)(pChar - pAnchor);
 					TCHAR szFileName[MAX_PATH] = { 0 };
 					SecureHelper::strncpy_x(szFileName, MAX_PATH, pAnchor, nFileNameLength);
+#ifdef STRICT_TYPED_ITEMIDS
+					PIDLIST_RELATIVE pidl = NULL;
+#else
 					LPITEMIDLIST pidl = NULL;
+#endif
 					DWORD dwAttrib = SFGAO_LINK;
 					if (SUCCEEDED(pFolder->ParseDisplayName(NULL, NULL, T2W(szFileName), NULL, &pidl, &dwAttrib)))
 					{
@@ -1316,7 +1324,11 @@ public:
 	bool m_bExpandInitialSelection;
 	TCHAR m_szFolderDisplayName[MAX_PATH];
 	TCHAR m_szFolderPath[MAX_PATH];
+#ifdef STRICT_TYPED_ITEMIDS
+	PIDLIST_ABSOLUTE m_pidlSelected;
+#else
 	LPITEMIDLIST m_pidlSelected;
+#endif
 	HWND m_hWnd;   // used only in the callback function
 
 // Constructor
