@@ -1398,6 +1398,15 @@ public:
 		m_bExpandInitialSelection = bExpand;
 	}
 
+#ifdef STRICT_TYPED_ITEMIDS
+	void SetRootFolder(PCIDLIST_ABSOLUTE pidl)
+#else
+	void SetRootFolder(LPCITEMIDLIST pidl)
+#endif
+	{
+		m_bi.pidlRoot = pidl;
+	}
+
 	// Methods to call after DoModal
 	LPITEMIDLIST GetSelectedItem(bool bDetach = false)
 	{
