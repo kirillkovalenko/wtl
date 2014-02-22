@@ -2468,11 +2468,17 @@ public:
 	// GetDefaults will not display a dialog but will get device defaults
 	HRESULT GetDefaults()
 	{
-		m_pdex.Flags |= PD_RETURNDEFAULT;
 		ATLASSERT(m_pdex.hDevMode == NULL);    // must be NULL
 		ATLASSERT(m_pdex.hDevNames == NULL);   // must be NULL
 
-		return ::PrintDlgEx(&m_pdex);
+		if(m_pdex.hwndOwner == NULL)   // set only if not specified before
+			m_pdex.hwndOwner = ::GetActiveWindow();
+
+		m_pdex.Flags |= PD_RETURNDEFAULT;
+		HRESULT hRet = ::PrintDlgEx(&m_pdex);
+		m_pdex.Flags &= ~PD_RETURNDEFAULT;
+
+		return hRet;
 	}
 
 	// Helpers for parsing information after successful return num. copies requested
