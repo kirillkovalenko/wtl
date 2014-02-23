@@ -63,9 +63,12 @@ class CSplitterImpl
 public:
 	enum { m_nPanesCount = 2, m_nPropMax = 10000 };
 
+	enum { m_cxyStep = 10 };
+
 	HWND m_hWndPane[m_nPanesCount];
 	RECT m_rcSplitter;
-	int m_xySplitterPos;
+	int m_xySplitterPos;            // splitter bar position
+	int m_xySplitterPosNew;         // new position while moving
 	int m_nDefActivePane;
 	int m_cxySplitBar;              // splitter bar width/height
 	static HCURSOR m_hCursor;
@@ -79,12 +82,10 @@ public:
 	int m_nSinglePane;             // single pane mode
 
 // Constructor
-	CSplitterImpl() :
-			m_xySplitterPos(-1), m_nDefActivePane(SPLIT_PANE_NONE), 
-			m_cxySplitBar(4), m_cxyMin(0), m_cxyBarEdge(0), m_bFullDrag(true), 
-			m_cxyDragOffset(0), m_nProportionalPos(0), m_bUpdateProportionalPos(true),
-			m_dwExtendedStyle(SPLIT_PROPORTIONAL),
-			m_nSinglePane(SPLIT_PANE_NONE)
+	CSplitterImpl() : m_xySplitterPos(-1), m_xySplitterPosNew(-1), m_nDefActivePane(SPLIT_PANE_NONE), 
+	                  m_cxySplitBar(4), m_cxyMin(0), m_cxyBarEdge(0), m_bFullDrag(true), 
+	                  m_cxyDragOffset(0), m_nProportionalPos(0), m_bUpdateProportionalPos(true),
+	                  m_dwExtendedStyle(SPLIT_PROPORTIONAL), m_nSinglePane(SPLIT_PANE_NONE)
 	{
 		m_hWndPane[SPLIT_PANE_LEFT] = NULL;
 		m_hWndPane[SPLIT_PANE_RIGHT] = NULL;
@@ -382,6 +383,39 @@ public:
 		}
 	}
 
+	// call to initiate moving splitter bar with keyboard
+	void MoveSplitterBar()
+	{
+		T* pT = static_cast<T*>(this);
+
+		int x = 0;
+		int y = 0;
+		if(t_bVertical)
+		{
+			x = m_xySplitterPos + (m_cxySplitBar / 2) + m_cxyBarEdge;
+			y = (m_rcSplitter.bottom - m_rcSplitter.top - m_cxySplitBar - m_cxyBarEdge) / 2;
+		}
+		else
+		{
+			x = (m_rcSplitter.right - m_rcSplitter.left - m_cxySplitBar - m_cxyBarEdge) / 2;
+			y = m_xySplitterPos + (m_cxySplitBar / 2) + m_cxyBarEdge;
+		}
+
+		POINT pt = { x, y };
+		pT->ClientToScreen(&pt);
+		::SetCursorPos(pt.x, pt.y);
+
+		pT->SetCapture();
+		::SetCursor(m_hCursor);
+		if(!m_bFullDrag)
+			DrawGhostBar();
+		if(t_bVertical)
+			m_cxyDragOffset = x - m_rcSplitter.left - m_xySplitterPos;
+		else
+			m_cxyDragOffset = y - m_rcSplitter.top - m_xySplitterPos;
+		m_xySplitterPosNew = m_xySplitterPos;
+	}
+
 // Overrideables
 	void DrawSplitterBar(CDCHandle dc)
 	{
@@ -438,6 +472,7 @@ public:
 			MESSAGE_HANDLER(WM_LBUTTONUP, OnLButtonUp)
 			MESSAGE_HANDLER(WM_LBUTTONDBLCLK, OnLButtonDoubleClick)
 			MESSAGE_HANDLER(WM_CAPTURECHANGED, OnCaptureChanged)
+			MESSAGE_HANDLER(WM_KEYDOWN, OnKeyDown)
 		}
 		MESSAGE_HANDLER(WM_SETFOCUS, OnSetFocus)
 #ifndef _WIN32_WCE
@@ -493,12 +528,12 @@ public:
 		return 0;
 	}
 
-	LRESULT OnMouseMove(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+	LRESULT OnMouseMove(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM lParam, BOOL& bHandled)
 	{
 		T* pT = static_cast<T*>(this);
 		int xPos = GET_X_LPARAM(lParam);
 		int yPos = GET_Y_LPARAM(lParam);
-		if((wParam & MK_LBUTTON) && ::GetCapture() == pT->m_hWnd)
+		if(::GetCapture() == pT->m_hWnd)
 		{
 			int xyNewSplitPos = 0;
 			if(t_bVertical)
@@ -536,11 +571,11 @@ public:
 
 	LRESULT OnLButtonDown(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM lParam, BOOL& bHandled)
 	{
+		T* pT = static_cast<T*>(this);
 		int xPos = GET_X_LPARAM(lParam);
 		int yPos = GET_Y_LPARAM(lParam);
-		if(IsOverSplitterBar(xPos, yPos))
+		if((::GetCapture() != pT->m_hWnd) && (IsOverSplitterBar(xPos, yPos)))
 		{
-			T* pT = static_cast<T*>(this);
 			pT->SetCapture();
 			::SetCursor(m_hCursor);
 			if(!m_bFullDrag)
@@ -549,14 +584,18 @@ public:
 				m_cxyDragOffset = xPos - m_rcSplitter.left - m_xySplitterPos;
 			else
 				m_cxyDragOffset = yPos - m_rcSplitter.top - m_xySplitterPos;
+			m_xySplitterPosNew = m_xySplitterPos;
 		}
+
 		bHandled = FALSE;
 		return 1;
 	}
 
 	LRESULT OnLButtonUp(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& bHandled)
 	{
+		m_xySplitterPosNew = m_xySplitterPos;
 		::ReleaseCapture();
+
 		bHandled = FALSE;
 		return 1;
 	}
@@ -565,18 +604,79 @@ public:
 	{
 		T* pT = static_cast<T*>(this);
 		pT->SetSplitterPos();   // middle
+
 		return 0;
 	}
 
 	LRESULT OnCaptureChanged(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
 	{
 		if(!m_bFullDrag)
-		{
 			DrawGhostBar();
+
+		if(!m_bFullDrag || (m_xySplitterPos != m_xySplitterPosNew))
+		{
+			m_xySplitterPos = m_xySplitterPosNew;
 			UpdateSplitterLayout();
 			T* pT = static_cast<T*>(this);
 			pT->UpdateWindow();
 		}
+
+		return 0;
+	}
+
+	LRESULT OnKeyDown(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& bHandled)
+	{
+		T* pT = static_cast<T*>(this);
+		if(::GetCapture() == pT->m_hWnd)
+		{
+			switch(wParam)
+			{
+			case VK_RETURN:
+				m_xySplitterPosNew = m_xySplitterPos;
+			case VK_ESCAPE:
+				::ReleaseCapture();
+				break;
+			case VK_LEFT:
+			case VK_RIGHT:
+				if(t_bVertical)
+				{
+					POINT pt = { 0, 0 };
+					::GetCursorPos(&pt);
+					int xyPos = m_xySplitterPos + ((wParam == VK_LEFT) ? -pT->m_cxyStep : pT->m_cxyStep);
+					int cxyMax = m_rcSplitter.right - m_rcSplitter.left;
+					if(xyPos < m_cxyMin + m_cxyBarEdge)
+						xyPos = m_cxyMin;
+					else if(xyPos > (cxyMax - m_cxySplitBar - m_cxyBarEdge - m_cxyMin))
+						xyPos = cxyMax - m_cxySplitBar - m_cxyBarEdge - m_cxyMin;
+					pt.x += xyPos - m_xySplitterPos;
+					::SetCursorPos(pt.x, pt.y);
+				}
+				break;
+			case VK_UP:
+			case VK_DOWN:
+				if(!t_bVertical)
+				{
+					POINT pt = { 0, 0 };
+					::GetCursorPos(&pt);
+					int xyPos = m_xySplitterPos + ((wParam == VK_UP) ? -pT->m_cxyStep : pT->m_cxyStep);
+					int cxyMax = m_rcSplitter.bottom - m_rcSplitter.top;
+					if(xyPos < m_cxyMin + m_cxyBarEdge)
+						xyPos = m_cxyMin;
+					else if(xyPos > (cxyMax - m_cxySplitBar - m_cxyBarEdge - m_cxyMin))
+						xyPos = cxyMax - m_cxySplitBar - m_cxyBarEdge - m_cxyMin;
+					pt.y += xyPos - m_xySplitterPos;
+					::SetCursorPos(pt.x, pt.y);
+				}
+				break;
+			default:
+				break;
+			}
+		}
+		else
+		{
+			bHandled = FALSE;
+		}
+
 		return 0;
 	}
 
@@ -591,6 +691,7 @@ public:
 		{
 			::SetFocus(m_hWndPane[m_nSinglePane]);
 		}
+
 		bHandled = FALSE;
 		return 1;
 	}
@@ -615,6 +716,7 @@ public:
 				}
 			}
 		}
+
 		return lRet;
 	}
 #endif // !_WIN32_WCE
