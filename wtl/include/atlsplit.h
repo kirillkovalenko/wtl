@@ -69,6 +69,7 @@ public:
 	RECT m_rcSplitter;
 	int m_xySplitterPos;            // splitter bar position
 	int m_xySplitterPosNew;         // new position while moving
+	HWND m_hWndFocusSave;
 	int m_nDefActivePane;
 	int m_cxySplitBar;              // splitter bar width/height
 	static HCURSOR m_hCursor;
@@ -82,9 +83,9 @@ public:
 	int m_nSinglePane;             // single pane mode
 
 // Constructor
-	CSplitterImpl() : m_xySplitterPos(-1), m_xySplitterPosNew(-1), m_nDefActivePane(SPLIT_PANE_NONE), 
-	                  m_cxySplitBar(4), m_cxyMin(0), m_cxyBarEdge(0), m_bFullDrag(true), 
-	                  m_cxyDragOffset(0), m_nProportionalPos(0), m_bUpdateProportionalPos(true),
+	CSplitterImpl() : m_xySplitterPos(-1), m_xySplitterPosNew(-1), m_hWndFocusSave(NULL), 
+	                  m_nDefActivePane(SPLIT_PANE_NONE), m_cxySplitBar(4), m_cxyMin(0), m_cxyBarEdge(0), 
+	                  m_bFullDrag(true), m_cxyDragOffset(0), m_nProportionalPos(0), m_bUpdateProportionalPos(true),
 	                  m_dwExtendedStyle(SPLIT_PROPORTIONAL), m_nSinglePane(SPLIT_PANE_NONE)
 	{
 		m_hWndPane[SPLIT_PANE_LEFT] = NULL;
@@ -406,6 +407,7 @@ public:
 		::SetCursorPos(pt.x, pt.y);
 
 		pT->SetCapture();
+		m_hWndFocusSave = pT->SetFocus();
 		::SetCursor(m_hCursor);
 		if(!m_bFullDrag)
 			DrawGhostBar();
@@ -574,9 +576,10 @@ public:
 		T* pT = static_cast<T*>(this);
 		int xPos = GET_X_LPARAM(lParam);
 		int yPos = GET_Y_LPARAM(lParam);
-		if((::GetCapture() != pT->m_hWnd) && (IsOverSplitterBar(xPos, yPos)))
+		if((::GetCapture() != pT->m_hWnd) && IsOverSplitterBar(xPos, yPos))
 		{
 			pT->SetCapture();
+			m_hWndFocusSave = pT->SetFocus();
 			::SetCursor(m_hCursor);
 			if(!m_bFullDrag)
 				DrawGhostBar();
@@ -586,6 +589,10 @@ public:
 				m_cxyDragOffset = yPos - m_rcSplitter.top - m_xySplitterPos;
 			m_xySplitterPosNew = m_xySplitterPos;
 		}
+		else if((::GetCapture() == pT->m_hWnd) && !IsOverSplitterBar(xPos, yPos))
+		{
+			::ReleaseCapture();
+		}
 
 		bHandled = FALSE;
 		return 1;
@@ -593,8 +600,12 @@ public:
 
 	LRESULT OnLButtonUp(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& bHandled)
 	{
-		m_xySplitterPosNew = m_xySplitterPos;
-		::ReleaseCapture();
+		T* pT = static_cast<T*>(this);
+		if(::GetCapture() == pT->m_hWnd)
+		{
+			m_xySplitterPosNew = m_xySplitterPos;
+			::ReleaseCapture();
+		}
 
 		bHandled = FALSE;
 		return 1;
@@ -620,6 +631,9 @@ public:
 			T* pT = static_cast<T*>(this);
 			pT->UpdateWindow();
 		}
+
+		if(m_hWndFocusSave != NULL)
+			::SetFocus(m_hWndFocusSave);
 
 		return 0;
 	}
@@ -682,14 +696,18 @@ public:
 
 	LRESULT OnSetFocus(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM, BOOL& bHandled)
 	{
-		if(m_nSinglePane == SPLIT_PANE_NONE)
+		T* pT = static_cast<T*>(this);
+		if(::GetCapture() != pT->m_hWnd)
 		{
-			if(m_nDefActivePane == SPLIT_PANE_LEFT || m_nDefActivePane == SPLIT_PANE_RIGHT)
-				::SetFocus(m_hWndPane[m_nDefActivePane]);
-		}
-		else
-		{
-			::SetFocus(m_hWndPane[m_nSinglePane]);
+			if(m_nSinglePane == SPLIT_PANE_NONE)
+			{
+				if(m_nDefActivePane == SPLIT_PANE_LEFT || m_nDefActivePane == SPLIT_PANE_RIGHT)
+					::SetFocus(m_hWndPane[m_nDefActivePane]);
+			}
+			else
+			{
+				::SetFocus(m_hWndPane[m_nSinglePane]);
+			}
 		}
 
 		bHandled = FALSE;
