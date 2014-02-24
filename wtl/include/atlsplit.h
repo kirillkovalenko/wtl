@@ -26,9 +26,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Classes in this file:
 //
-// CSplitterImpl<T, t_bVertical>
-// CSplitterWindowImpl<T, t_bVertical, TBase, TWinTraits>
-// CSplitterWindowT<t_bVertical>
+// CSplitterImpl<T>
+// CSplitterWindowImpl<T, TBase, TWinTraits>
+// CSplitterWindowT<t_bVertical> - CSplitterWindow, CHorSplitterWindow
 
 
 namespace WTL
@@ -57,14 +57,13 @@ namespace WTL
 // SPLIT_GRADIENTBAR doesn't wotk with _ATL_NO_MSIMG
 
 
-template <class T, bool t_bVertical = true>
+template <class T>
 class CSplitterImpl
 {
 public:
-	enum { m_nPanesCount = 2, m_nPropMax = 10000 };
+	enum { m_nPanesCount = 2, m_nPropMax = 10000, m_cxyStep = 10 };
 
-	enum { m_cxyStep = 10 };
-
+	bool m_bVertical;
 	HWND m_hWndPane[m_nPanesCount];
 	RECT m_rcSplitter;
 	int m_xySplitterPos;            // splitter bar position
@@ -72,7 +71,7 @@ public:
 	HWND m_hWndFocusSave;
 	int m_nDefActivePane;
 	int m_cxySplitBar;              // splitter bar width/height
-	static HCURSOR m_hCursor;
+	HCURSOR m_hCursor;
 	int m_cxyMin;                   // minimum pane size
 	int m_cxyBarEdge;              	// splitter bar edge
 	bool m_bFullDrag;
@@ -83,31 +82,16 @@ public:
 	int m_nSinglePane;             // single pane mode
 
 // Constructor
-	CSplitterImpl() : m_xySplitterPos(-1), m_xySplitterPosNew(-1), m_hWndFocusSave(NULL), 
-	                  m_nDefActivePane(SPLIT_PANE_NONE), m_cxySplitBar(4), m_cxyMin(0), m_cxyBarEdge(0), 
-	                  m_bFullDrag(true), m_cxyDragOffset(0), m_nProportionalPos(0), m_bUpdateProportionalPos(true),
-	                  m_dwExtendedStyle(SPLIT_PROPORTIONAL), m_nSinglePane(SPLIT_PANE_NONE)
+	CSplitterImpl(bool bVertical = true) : 
+	              m_bVertical(bVertical), m_xySplitterPos(-1), m_xySplitterPosNew(-1), m_hWndFocusSave(NULL), 
+	              m_nDefActivePane(SPLIT_PANE_NONE), m_cxySplitBar(4), m_hCursor(NULL), m_cxyMin(0), m_cxyBarEdge(0), 
+	              m_bFullDrag(true), m_cxyDragOffset(0), m_nProportionalPos(0), m_bUpdateProportionalPos(true),
+	              m_dwExtendedStyle(SPLIT_PROPORTIONAL), m_nSinglePane(SPLIT_PANE_NONE)
 	{
 		m_hWndPane[SPLIT_PANE_LEFT] = NULL;
 		m_hWndPane[SPLIT_PANE_RIGHT] = NULL;
 
 		::SetRectEmpty(&m_rcSplitter);
-
-		if(m_hCursor == NULL)
-		{
-			CStaticDataInitCriticalSectionLock lock;
-			if(FAILED(lock.Lock()))
-			{
-				ATLTRACE2(atlTraceUI, 0, _T("ERROR : Unable to lock critical section in CSplitterImpl::CSplitterImpl.\n"));
-				ATLASSERT(FALSE);
-				return;
-			}
-
-			if(m_hCursor == NULL)
-				m_hCursor = ::LoadCursor(NULL, t_bVertical ? IDC_SIZEWE : IDC_SIZENS);
-
-			lock.Unlock();
-		}
 	}
 
 // Attributes
@@ -142,7 +126,7 @@ public:
 	{
 		if(xyPos == -1)   // -1 == middle
 		{
-			if(t_bVertical)
+			if(m_bVertical)
 				xyPos = (m_rcSplitter.right - m_rcSplitter.left - m_cxySplitBar - m_cxyBarEdge) / 2;
 			else
 				xyPos = (m_rcSplitter.bottom - m_rcSplitter.top - m_cxySplitBar - m_cxyBarEdge) / 2;
@@ -150,7 +134,7 @@ public:
 
 		// Adjust if out of valid range
 		int cxyMax = 0;
-		if(t_bVertical)
+		if(m_bVertical)
 			cxyMax = m_rcSplitter.right - m_rcSplitter.left;
 		else
 			cxyMax = m_rcSplitter.bottom - m_rcSplitter.top;
@@ -391,7 +375,7 @@ public:
 
 		int x = 0;
 		int y = 0;
-		if(t_bVertical)
+		if(m_bVertical)
 		{
 			x = m_xySplitterPos + (m_cxySplitBar / 2) + m_cxyBarEdge;
 			y = (m_rcSplitter.bottom - m_rcSplitter.top - m_cxySplitBar - m_cxyBarEdge) / 2;
@@ -411,11 +395,32 @@ public:
 		::SetCursor(m_hCursor);
 		if(!m_bFullDrag)
 			DrawGhostBar();
-		if(t_bVertical)
+		if(m_bVertical)
 			m_cxyDragOffset = x - m_rcSplitter.left - m_xySplitterPos;
 		else
 			m_cxyDragOffset = y - m_rcSplitter.top - m_xySplitterPos;
 		m_xySplitterPosNew = m_xySplitterPos;
+	}
+
+	void SetOrientation(bool bVertical, bool bUpdate = true)
+	{
+		if(m_bVertical != bVertical)
+		{
+			m_bVertical = bVertical;
+
+			m_hCursor = ::LoadCursor(NULL, m_bVertical ? IDC_SIZEWE : IDC_SIZENS);
+
+			T* pT = static_cast<T*>(this);
+			pT->GetSystemSettings(false);
+
+			if(m_bVertical)
+				m_xySplitterPos = ::MulDiv(m_xySplitterPos, m_rcSplitter.right - m_rcSplitter.left, m_rcSplitter.bottom - m_rcSplitter.top);
+			else
+				m_xySplitterPos = ::MulDiv(m_xySplitterPos, m_rcSplitter.bottom - m_rcSplitter.top, m_rcSplitter.right - m_rcSplitter.left);
+		}
+
+		if(bUpdate)
+			UpdateSplitterLayout();
 	}
 
 // Overrideables
@@ -430,19 +435,19 @@ public:
 			if((m_dwExtendedStyle & SPLIT_GRADIENTBAR) != 0)
 			{
 				RECT rect2 = rect;
-				if(t_bVertical)
+				if(m_bVertical)
 					rect2.left = (rect.left + rect.right) / 2 - 1;
 				else
 					rect2.top = (rect.top + rect.bottom) / 2 - 1;
 
-				dc.GradientFillRect(rect2, ::GetSysColor(COLOR_3DFACE), ::GetSysColor(COLOR_3DSHADOW), t_bVertical);
+				dc.GradientFillRect(rect2, ::GetSysColor(COLOR_3DFACE), ::GetSysColor(COLOR_3DSHADOW), m_bVertical);
 			}
 #endif // !defined(_ATL_NO_MSIMG) || (_WIN32_WCE >= 420)
 
 			// draw 3D edge if needed
 			T* pT = static_cast<T*>(this);
 			if((pT->GetExStyle() & WS_EX_CLIENTEDGE) != 0)
-				dc.DrawEdge(&rect, EDGE_RAISED, t_bVertical ? (BF_LEFT | BF_RIGHT) : (BF_TOP | BF_BOTTOM));
+				dc.DrawEdge(&rect, EDGE_RAISED, m_bVertical ? (BF_LEFT | BF_RIGHT) : (BF_TOP | BF_BOTTOM));
 		}
 	}
 
@@ -485,6 +490,8 @@ public:
 
 	LRESULT OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& bHandled)
 	{
+		m_hCursor = ::LoadCursor(NULL, m_bVertical ? IDC_SIZEWE : IDC_SIZENS);
+
 		T* pT = static_cast<T*>(this);
 		pT->GetSystemSettings(false);
 
@@ -538,7 +545,7 @@ public:
 		if(::GetCapture() == pT->m_hWnd)
 		{
 			int xyNewSplitPos = 0;
-			if(t_bVertical)
+			if(m_bVertical)
 				xyNewSplitPos = xPos - m_rcSplitter.left - m_cxyDragOffset;
 			else
 				xyNewSplitPos = yPos - m_rcSplitter.top - m_cxyDragOffset;
@@ -583,7 +590,7 @@ public:
 			::SetCursor(m_hCursor);
 			if(!m_bFullDrag)
 				DrawGhostBar();
-			if(t_bVertical)
+			if(m_bVertical)
 				m_cxyDragOffset = xPos - m_rcSplitter.left - m_xySplitterPos;
 			else
 				m_cxyDragOffset = yPos - m_rcSplitter.top - m_xySplitterPos;
@@ -652,7 +659,7 @@ public:
 				break;
 			case VK_LEFT:
 			case VK_RIGHT:
-				if(t_bVertical)
+				if(m_bVertical)
 				{
 					POINT pt = { 0, 0 };
 					::GetCursorPos(&pt);
@@ -668,7 +675,7 @@ public:
 				break;
 			case VK_UP:
 			case VK_DOWN:
-				if(!t_bVertical)
+				if(!m_bVertical)
 				{
 					POINT pt = { 0, 0 };
 					::GetCursorPos(&pt);
@@ -789,7 +796,7 @@ public:
 		if(m_nSinglePane != SPLIT_PANE_NONE || m_xySplitterPos == -1)
 			return false;
 
-		if(t_bVertical)
+		if(m_bVertical)
 		{
 			lpRect->left = m_rcSplitter.left + m_xySplitterPos;
 			lpRect->top = m_rcSplitter.top;
@@ -821,7 +828,7 @@ public:
 		}
 		else if(nPane == SPLIT_PANE_LEFT)
 		{
-			if(t_bVertical)
+			if(m_bVertical)
 			{
 				lpRect->left = m_rcSplitter.left;
 				lpRect->top = m_rcSplitter.top;
@@ -838,7 +845,7 @@ public:
 		}
 		else if(nPane == SPLIT_PANE_RIGHT)
 		{
-			if(t_bVertical)
+			if(m_bVertical)
 			{
 				lpRect->left = m_rcSplitter.left + m_xySplitterPos + m_cxySplitBar + m_cxyBarEdge;
 				lpRect->top = m_rcSplitter.top;
@@ -873,8 +880,8 @@ public:
 			return false;
 		if(m_xySplitterPos == -1 || !IsOverSplitterRect(x, y))
 			return false;
-		int xy = t_bVertical ? x : y;
-		int xyOff = t_bVertical ? m_rcSplitter.left : m_rcSplitter.top;
+		int xy = m_bVertical ? x : y;
+		int xyOff = m_bVertical ? m_rcSplitter.left : m_rcSplitter.top;
 		return ((xy >= (xyOff + m_xySplitterPos)) && (xy < xyOff + m_xySplitterPos + m_cxySplitBar + m_cxyBarEdge));
 	}
 
@@ -907,22 +914,22 @@ public:
 		if((m_dwExtendedStyle & SPLIT_FIXEDBARSIZE) == 0)
 		{
 #ifndef _WIN32_WCE
-			m_cxySplitBar = ::GetSystemMetrics(t_bVertical ? SM_CXSIZEFRAME : SM_CYSIZEFRAME);
+			m_cxySplitBar = ::GetSystemMetrics(m_bVertical ? SM_CXSIZEFRAME : SM_CYSIZEFRAME);
 #else // CE specific
-			m_cxySplitBar = 2 * ::GetSystemMetrics(t_bVertical ? SM_CXEDGE : SM_CYEDGE);
+			m_cxySplitBar = 2 * ::GetSystemMetrics(m_bVertical ? SM_CXEDGE : SM_CYEDGE);
 #endif // _WIN32_WCE
 		}
 
 		T* pT = static_cast<T*>(this);
 		if((pT->GetExStyle() & WS_EX_CLIENTEDGE))
 		{
-			m_cxyBarEdge = 2 * ::GetSystemMetrics(t_bVertical ? SM_CXEDGE : SM_CYEDGE);
+			m_cxyBarEdge = 2 * ::GetSystemMetrics(m_bVertical ? SM_CXEDGE : SM_CYEDGE);
 			m_cxyMin = 0;
 		}
 		else
 		{
 			m_cxyBarEdge = 0;
-			m_cxyMin = 2 * ::GetSystemMetrics(t_bVertical ? SM_CXEDGE : SM_CYEDGE);
+			m_cxyMin = 2 * ::GetSystemMetrics(m_bVertical ? SM_CXEDGE : SM_CYEDGE);
 		}
 
 #ifndef _WIN32_WCE
@@ -940,7 +947,7 @@ public:
 
 	void StoreProportionalPos()
 	{
-		int cxyTotal = t_bVertical ? (m_rcSplitter.right - m_rcSplitter.left - m_cxySplitBar - m_cxyBarEdge) : (m_rcSplitter.bottom - m_rcSplitter.top - m_cxySplitBar - m_cxyBarEdge);
+		int cxyTotal = m_bVertical ? (m_rcSplitter.right - m_rcSplitter.left - m_cxySplitBar - m_cxyBarEdge) : (m_rcSplitter.bottom - m_rcSplitter.top - m_cxySplitBar - m_cxyBarEdge);
 		if(cxyTotal > 0)
 			m_nProportionalPos = ::MulDiv(m_xySplitterPos, m_nPropMax, cxyTotal);
 		else
@@ -950,7 +957,7 @@ public:
 
 	void UpdateProportionalPos()
 	{
-		int cxyTotal = t_bVertical ? (m_rcSplitter.right - m_rcSplitter.left - m_cxySplitBar - m_cxyBarEdge) : (m_rcSplitter.bottom - m_rcSplitter.top - m_cxySplitBar - m_cxyBarEdge);
+		int cxyTotal = m_bVertical ? (m_rcSplitter.right - m_rcSplitter.left - m_cxySplitBar - m_cxyBarEdge) : (m_rcSplitter.bottom - m_rcSplitter.top - m_cxySplitBar - m_cxyBarEdge);
 		if(cxyTotal > 0)
 		{
 			int xyNewPos = ::MulDiv(m_nProportionalPos, cxyTotal, m_nPropMax);
@@ -967,7 +974,7 @@ public:
 
 	void StoreRightAlignPos()
 	{
-		int cxyTotal = t_bVertical ? (m_rcSplitter.right - m_rcSplitter.left - m_cxySplitBar - m_cxyBarEdge) : (m_rcSplitter.bottom - m_rcSplitter.top - m_cxySplitBar - m_cxyBarEdge);
+		int cxyTotal = m_bVertical ? (m_rcSplitter.right - m_rcSplitter.left - m_cxySplitBar - m_cxyBarEdge) : (m_rcSplitter.bottom - m_rcSplitter.top - m_cxySplitBar - m_cxyBarEdge);
 		if(cxyTotal > 0)
 			m_nProportionalPos = cxyTotal - m_xySplitterPos;
 		else
@@ -977,7 +984,7 @@ public:
 
 	void UpdateRightAlignPos()
 	{
-		int cxyTotal = t_bVertical ? (m_rcSplitter.right - m_rcSplitter.left - m_cxySplitBar - m_cxyBarEdge) : (m_rcSplitter.bottom - m_rcSplitter.top - m_cxySplitBar - m_cxyBarEdge);
+		int cxyTotal = m_bVertical ? (m_rcSplitter.right - m_rcSplitter.left - m_cxySplitBar - m_cxyBarEdge) : (m_rcSplitter.bottom - m_rcSplitter.top - m_cxySplitBar - m_cxyBarEdge);
 		if(cxyTotal > 0)
 		{
 			m_bUpdateProportionalPos = false;
@@ -992,24 +999,23 @@ public:
 	}
 };
 
-template <class T, bool t_bVertical> HCURSOR CSplitterImpl< T, t_bVertical>::m_hCursor = NULL;
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // CSplitterWindowImpl - Implements a splitter window
 
-template <class T, bool t_bVertical = true, class TBase = ATL::CWindow, class TWinTraits = ATL::CControlWinTraits>
-class ATL_NO_VTABLE CSplitterWindowImpl : public ATL::CWindowImpl< T, TBase, TWinTraits >, public CSplitterImpl< T , t_bVertical >
+template <class T, class TBase = ATL::CWindow, class TWinTraits = ATL::CControlWinTraits>
+class ATL_NO_VTABLE CSplitterWindowImpl : public ATL::CWindowImpl< T, TBase, TWinTraits >, public CSplitterImpl< T >
 {
 public:
 	DECLARE_WND_CLASS_EX(NULL, CS_DBLCLKS, COLOR_WINDOW)
 
-	typedef CSplitterImpl< T , t_bVertical >   _baseClass;
+	CSplitterWindowImpl(bool bVertical = true) : CSplitterImpl(bVertical)
+	{ }
 
 	BEGIN_MSG_MAP(CSplitterWindowImpl)
 		MESSAGE_HANDLER(WM_ERASEBKGND, OnEraseBackground)
 		MESSAGE_HANDLER(WM_SIZE, OnSize)
-		CHAIN_MSG_MAP(_baseClass)
+		CHAIN_MSG_MAP(CSplitterImpl< T >)
 		FORWARD_NOTIFICATIONS()
 	END_MSG_MAP()
 
@@ -1031,13 +1037,16 @@ public:
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// CSplitterWindow - Implements a splitter window to be used as is
+// CSplitterWindow/CHorSplitterWindow - Implements splitter windows to be used as is
 
 template <bool t_bVertical = true>
-class CSplitterWindowT : public CSplitterWindowImpl<CSplitterWindowT<t_bVertical>, t_bVertical>
+class CSplitterWindowT : public CSplitterWindowImpl<CSplitterWindowT<t_bVertical> >
 {
 public:
 	DECLARE_WND_CLASS_EX(_T("WTL_SplitterWindow"), CS_DBLCLKS, COLOR_WINDOW)
+
+	CSplitterWindowT() : CSplitterWindowImpl(t_bVertical)
+	{ }
 };
 
 typedef CSplitterWindowT<true>    CSplitterWindow;
