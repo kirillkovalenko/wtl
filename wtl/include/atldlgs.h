@@ -3541,8 +3541,8 @@ public:
 ///////////////////////////////////////////////////////////////////////////////
 // CIndirectDialogImpl - dialogs with template in memory
 
-template <class T, class TDlgTemplate = CMemDlgTemplate, class TBase = ATL::CDialogImpl<T, ATL::CWindow> >
-class ATL_NO_VTABLE CIndirectDialogImpl : public TBase
+template <class T, class TDlgTemplate = CMemDlgTemplate, class TBase = ATL::CWindow>
+class ATL_NO_VTABLE CIndirectDialogImpl : public ATL::CDialogImpl< T, TBase >
 {
 public:
 	enum { IDD = 0 };   // no dialog template resource
@@ -3561,20 +3561,20 @@ public:
 		T* pT = static_cast<T*>(this);
 		ATLASSERT(pT->m_hWnd == NULL);
 
-		if (!m_Template.IsValid())
+		if(!m_Template.IsValid())
 			CreateTemplate();
 
-#if (_ATL_VER >= 0x0800)
+#if (_ATL_VER >= 0x0700)
 		// Allocate the thunk structure here, where we can fail gracefully.
-		BOOL result = m_thunk.Init(NULL, NULL);
-		if (result == FALSE)
+		BOOL bRet = m_thunk.Init(NULL, NULL);
+		if(bRet == FALSE)
 		{
-			SetLastError(ERROR_OUTOFMEMORY);
+			::SetLastError(ERROR_OUTOFMEMORY);
 			return -1;
 		}
-#endif // (_ATL_VER >= 0x0800)
+#endif // (_ATL_VER >= 0x0700)
 
-		ModuleHelper::AddCreateWndData(&m_thunk.cd, pT);
+		ModuleHelper::AddCreateWndData(&m_thunk.cd, (ATL::CDialogImplBaseT< TBase >*)pT);
 
 #ifdef _DEBUG
 		m_bModal = true;
@@ -3588,20 +3588,20 @@ public:
 		T* pT = static_cast<T*>(this);
 		ATLASSERT(pT->m_hWnd == NULL);
 
-		if (!m_Template.IsValid())
+		if(!m_Template.IsValid())
 			CreateTemplate();
 
-#if (_ATL_VER >= 0x0800)
+#if (_ATL_VER >= 0x0700)
 		// Allocate the thunk structure here, where we can fail gracefully.
-		BOOL result = m_thunk.Init(NULL, NULL);
-		if (result == FALSE) 
+		BOOL bRet = m_thunk.Init(NULL, NULL);
+		if(bRet == FALSE) 
 		{
-			SetLastError(ERROR_OUTOFMEMORY);
+			::SetLastError(ERROR_OUTOFMEMORY);
 			return NULL;
 		}
-#endif // (_ATL_VER >= 0x0800)
+#endif // (_ATL_VER >= 0x0700)
 
-		ModuleHelper::AddCreateWndData(&m_thunk.cd, pT);
+		ModuleHelper::AddCreateWndData(&m_thunk.cd, (ATL::CDialogImplBaseT< TBase >*)pT);
 
 #ifdef _DEBUG
 		m_bModal = false;
