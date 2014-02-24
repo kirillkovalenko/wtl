@@ -2085,10 +2085,10 @@ public:
 			if (RunTimeHelper::IsRibbonUIAvailable())
 				hr = m_pIUIFramework.CoCreateInstance(CLSID_UIRibbonFramework);
 			else
-				ATLTRACE(L"Ribbon UI not available\n");
+				ATLTRACE2(atlTraceUI, 0, _T("Ribbon UI not available\n"));
 
 		if FAILED(hr)
-			ATLTRACE(L"Ribbon construction failed\n");
+			ATLTRACE2(atlTraceUI, 0, _T("Ribbon construction failed\n"));
 
 		ATLASSERT(SUCCEEDED(hr));
 	}
@@ -2856,7 +2856,7 @@ public:
 		{
 			if(k_(*key) != k_BooleanValue)
 			{
-				ATLTRACE(L"Control ID %d is not handled\n", nCmdID);
+				ATLTRACE2(atlTraceUI, 0, _T("Control ID %d is not handled\n"), nCmdID);
 				return E_NOTIMPL;
 			}
 			BOOL bChecked = FALSE;
