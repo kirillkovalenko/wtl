@@ -3083,28 +3083,31 @@ public:
 		ATLASSERT(::IsMenu(m_hMenu));
 
 		int nItems = ::GetMenuItemCount(m_hMenu);
-		int nInsertPoint;
-		for(nInsertPoint = 0; nInsertPoint < nItems; nInsertPoint++)
+		int nInsertPoint = 0;
+		for(int i = 0; i < nItems; i++)
 		{
 			CMenuItemInfo mi;
 			mi.fMask = MIIM_ID;
-			::GetMenuItemInfo(m_hMenu, nInsertPoint, TRUE, &mi);
+			::GetMenuItemInfo(m_hMenu, i, TRUE, &mi);
 			if (mi.wID == t_nFirstID)
+			{
+				nInsertPoint = i;
 				break;
+			}
 		}
+
 		ATLASSERT(nInsertPoint < nItems && "You need a menu item with an ID = t_nFirstID");
 
-		int nItem;
-		for(nItem = t_nFirstID; nItem < t_nFirstID + m_nMaxEntries; nItem++)
+		for(int j = t_nFirstID; j < (t_nFirstID + m_nMaxEntries); j++)
 		{
 			// keep the first one as an insertion point
-			if (nItem != t_nFirstID)
-				::DeleteMenu(m_hMenu, nItem, MF_BYCOMMAND);
+			if (j != t_nFirstID)
+				::DeleteMenu(m_hMenu, j, MF_BYCOMMAND);
 		}
 
 		TCHAR szItemText[t_cchItemLen + 6] = { 0 };   // add space for &, 2 digits, and a space
 		int nSize = m_arrDocs.GetSize();
-		nItem = 0;
+		int nItem = 0;
 		if(nSize > 0)
 		{
 			for(nItem = 0; nItem < nSize; nItem++)
@@ -3123,6 +3126,7 @@ public:
 					ATLASSERT(bRet);
 					SecureHelper::wsprintf_x(szItemText, t_cchItemLen + 6, _T("&%i %s"), nItem + 1, szBuff);
 				}
+
 				::InsertMenu(m_hMenu, nInsertPoint + nItem, MF_BYPOSITION | MF_STRING, t_nFirstID + nItem, szItemText);
 			}
 		}
