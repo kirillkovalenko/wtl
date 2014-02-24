@@ -6357,17 +6357,24 @@ public:
 	}
 
 #ifndef _WIN32_WCE
-	CToolTipCtrl GetTooltips() const
+	CToolTipCtrl GetToolTips() const
 	{
 		ATLASSERT(::IsWindow(m_hWnd));
 		return CToolTipCtrl((HWND)::SendMessage(m_hWnd, TCM_GETTOOLTIPS, 0, 0L));
 	}
 
-	void SetTooltips(HWND hWndToolTip)
+	// this method is deprecated, please use GetToolTips
+	CToolTipCtrl GetTooltips() const { return GetToolTips(); }
+
+	void SetToolTips(HWND hWndToolTip)
 	{
 		ATLASSERT(::IsWindow(m_hWnd));
 		::SendMessage(m_hWnd, TCM_SETTOOLTIPS, (WPARAM)hWndToolTip, 0L);
 	}
+
+	// this method is deprecated, please use SetToolTips
+	void SetTooltips(HWND hWndToolTip) { SetToolTips(hWndToolTip); }
+
 #endif // !_WIN32_WCE
 
 	int GetCurFocus() const
