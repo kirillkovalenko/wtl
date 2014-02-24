@@ -5894,6 +5894,16 @@ public:
 		return (BOOL)::SendMessage(m_hWnd, TB_DELETEBUTTON, nIndex, 0L);
 	}
 
+	BOOL InsertSeparator(int nIndex, int cxWidth = 8)
+	{
+		return InsertButton(nIndex, 0, BTNS_SEP, 0, cxWidth, (INT_PTR)0, 0);
+	}
+
+	BOOL AddSeparator(int cxWidth = 8)
+	{
+		return AddButton(0, BTNS_SEP, 0, cxWidth, (INT_PTR)0, 0);
+	}
+
 	UINT CommandToIndex(UINT nID) const
 	{
 		ATLASSERT(::IsWindow(m_hWnd));
