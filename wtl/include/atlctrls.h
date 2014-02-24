@@ -47,7 +47,7 @@
 // CEditCommands<T>
 // CScrollBarT<TBase> - CScrollBar
 //
-// CImageList
+// CImageListT<t_bManaged> - CImageList, CImageListManaged
 // CListViewCtrlT<TBase> - CListViewCtrl
 // CTreeViewCtrlT<TBase> - CTreeViewCtrl
 // CTreeItemT<TBase> - CTreeItem
@@ -1847,28 +1847,41 @@ typedef CScrollBarT<ATL::CWindow>   CScrollBar;
 ///////////////////////////////////////////////////////////////////////////////
 // CImageList
 
-class CImageList
+// forward declarations
+template <bool t_bManaged> class CImageListT;
+typedef CImageListT<false>   CImageList;
+typedef CImageListT<true>    CImageListManaged;
+
+
+template <bool t_bManaged>
+class CImageListT
 {
 public:
+// Data members
 	HIMAGELIST m_hImageList;
 
-// Constructor
-	CImageList(HIMAGELIST hImageList = NULL) : m_hImageList(hImageList)
+// Constructor/destructor/operators
+	CImageListT(HIMAGELIST hImageList = NULL) : m_hImageList(hImageList)
 	{ }
 
-// Operators, etc.
-	CImageList& operator =(HIMAGELIST hImageList)
+	~CImageListT()
 	{
-		m_hImageList = hImageList;
-		return *this;
+		if(t_bManaged && (m_hImageList != NULL))
+			Destroy();
 	}
 
-	operator HIMAGELIST() const { return m_hImageList; }
+	CImageListT<t_bManaged>& operator =(HIMAGELIST hImageList)
+	{
+		Attach(hImageList);
+		return *this;
+	}
 
 	void Attach(HIMAGELIST hImageList)
 	{
 		ATLASSERT(m_hImageList == NULL);
 		ATLASSERT(hImageList != NULL);
+		if(t_bManaged && (m_hImageList != NULL) && (m_hImageList != hImageList))
+			ImageList_Destroy(m_hImageList);
 		m_hImageList = hImageList;
 	}
 
@@ -1878,6 +1891,8 @@ public:
 		m_hImageList = NULL;
 		return hImageList;
 	}
+
+	operator HIMAGELIST() const { return m_hImageList; }
 
 	bool IsNull() const { return (m_hImageList == NULL); }
 
