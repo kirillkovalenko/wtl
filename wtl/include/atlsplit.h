@@ -1009,7 +1009,7 @@ class ATL_NO_VTABLE CSplitterWindowImpl : public ATL::CWindowImpl< T, TBase, TWi
 public:
 	DECLARE_WND_CLASS_EX(NULL, CS_DBLCLKS, COLOR_WINDOW)
 
-	CSplitterWindowImpl(bool bVertical = true) : CSplitterImpl(bVertical)
+	CSplitterWindowImpl(bool bVertical = true) : CSplitterImpl< T >(bVertical)
 	{ }
 
 	BEGIN_MSG_MAP(CSplitterWindowImpl)
@@ -1045,7 +1045,7 @@ class CSplitterWindowT : public CSplitterWindowImpl<CSplitterWindowT<t_bVertical
 public:
 	DECLARE_WND_CLASS_EX(_T("WTL_SplitterWindow"), CS_DBLCLKS, COLOR_WINDOW)
 
-	CSplitterWindowT() : CSplitterWindowImpl(t_bVertical)
+	CSplitterWindowT() : CSplitterWindowImpl<CSplitterWindowT<t_bVertical> >(t_bVertical)
 	{ }
 };
 
