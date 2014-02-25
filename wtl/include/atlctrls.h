@@ -6616,10 +6616,10 @@ public:
 		return (int)::SendMessage(m_hWnd, TBM_GETSELSTART, 0, 0L);
 	}
 
-	void SetSelStart(int nMin)
+	void SetSelStart(int nMin, BOOL bRedraw = TRUE)
 	{
 		ATLASSERT(::IsWindow(m_hWnd));
-		::SendMessage(m_hWnd, TBM_SETSELSTART, 0, (LPARAM)nMin);
+		::SendMessage(m_hWnd, TBM_SETSELSTART, bRedraw, (LPARAM)nMin);
 	}
 
 	int GetSelEnd() const
@@ -6628,10 +6628,10 @@ public:
 		return (int)::SendMessage(m_hWnd, TBM_GETSELEND, 0, 0L);
 	}
 
-	void SetSelEnd(int nMax)
+	void SetSelEnd(int nMax, BOOL bRedraw = TRUE)
 	{
 		ATLASSERT(::IsWindow(m_hWnd));
-		::SendMessage(m_hWnd, TBM_SETSELEND, 0, (LPARAM)nMax);
+		::SendMessage(m_hWnd, TBM_SETSELEND, bRedraw, (LPARAM)nMax);
 	}
 
 	void GetSelection(int& nMin, int& nMax) const
@@ -6640,10 +6640,10 @@ public:
 		nMax = GetSelEnd();
 	}
 
-	void SetSelection(int nMin, int nMax)
+	void SetSelection(int nMin, int nMax, BOOL bRedraw = TRUE)
 	{
-		SetSelStart(nMin);
-		SetSelEnd(nMax);
+		SetSelStart(nMin, FALSE);
+		SetSelEnd(nMax, bRedraw);
 	}
 
 	void GetChannelRect(LPRECT lprc) const
