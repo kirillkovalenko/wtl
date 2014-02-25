@@ -1724,10 +1724,23 @@ public:
 
 			// should be on type modifier or specifier
 			int nModifier = 0;
-			if(lpsz[0] == _T('I') && lpsz[1] == _T('6') && lpsz[2] == _T('4'))
+			if(lpsz[0] == _T('I'))
 			{
-				lpsz += 3;
-				nModifier = FORCE_INT64;
+				if((lpsz[1] == _T('6')) && (lpsz[2] == _T('4')))
+				{
+					lpsz += 3;
+					nModifier = FORCE_INT64;
+				}
+				else if((lpsz[1] == _T('3')) && (lpsz[2] == _T('2')))
+				{
+					lpsz += 3;
+				}
+				else
+				{
+					lpsz++;
+					if(sizeof(size_t) == 8)
+						nModifier = FORCE_INT64;
+				}
 			}
 			else
 			{
