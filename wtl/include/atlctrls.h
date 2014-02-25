@@ -3785,7 +3785,7 @@ public:
 		return InsertColumn(nItem, &lvc);
 	}
 
-	int AddItem(int nItem, int nSubItem, LPCTSTR strItem, int nImageIndex = -1)
+	int AddItem(int nItem, int nSubItem, LPCTSTR strItem, int nImageIndex = -3)
 	{
 		ATLASSERT(::IsWindow(m_hWnd));
 		LVITEM lvItem = { 0 };
@@ -3793,7 +3793,7 @@ public:
 		lvItem.iItem = nItem;
 		lvItem.iSubItem = nSubItem;
 		lvItem.pszText = (LPTSTR)strItem;
-		if(nImageIndex != -1)
+		if(nImageIndex != -3)
 		{
 			lvItem.mask |= LVIF_IMAGE;
 			lvItem.iImage = nImageIndex;
@@ -7246,12 +7246,10 @@ typedef CAnimateCtrlT<ATL::CWindow>   CAnimateCtrl;
 
 #ifndef _WIN32_WCE
 
-#ifdef _UNICODE
-#if (_RICHEDIT_VER == 0x0100)
-#undef RICHEDIT_CLASS
-#define RICHEDIT_CLASS	L"RICHEDIT"
-#endif // (_RICHEDIT_VER == 0x0100)
-#endif // _UNICODE
+#if defined(_UNICODE) && (_RICHEDIT_VER == 0x0100)
+  #undef RICHEDIT_CLASS
+  #define RICHEDIT_CLASS	L"RICHEDIT"
+#endif
 
 template <class TBase>
 class CRichEditCtrlT : public TBase
