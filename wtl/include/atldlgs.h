@@ -3142,7 +3142,8 @@ public:
 #endif // (_ATL_VER >= 0x800)
 
 
-class CMemDlgTemplate
+template <class TWinTraits>
+class CMemDlgTemplateT
 {
 public:
 	enum StdCtrlType
@@ -3155,10 +3156,10 @@ public:
 		CTRL_COMBOBOX  = 0x0085
 	};
 
-	CMemDlgTemplate() : m_hData(NULL), m_pData(NULL), m_pPtr(NULL), m_cAllocated(0)
+	CMemDlgTemplateT() : m_hData(NULL), m_pData(NULL), m_pPtr(NULL), m_cAllocated(0)
 	{ }
 
-	~CMemDlgTemplate()
+	~CMemDlgTemplateT()
 	{
 		Reset();
 	}
@@ -3307,7 +3308,7 @@ public:
 			DLGTEMPLATEEX* dlg = (DLGTEMPLATEEX*)m_pData;
 			dlg->cDlgItems++;
 
-			DLGITEMTEMPLATEEX item = {dwHelpID, ATL::CControlWinTraits::GetWndExStyle(0) | dwExStyle, ATL::CControlWinTraits::GetWndStyle(0) | dwStyle, nX, nY, nWidth, nHeight, wId};
+			DLGITEMTEMPLATEEX item = {dwHelpID, TWinTraits::GetWndExStyle(0) | dwExStyle, TWinTraits::GetWndStyle(0) | dwStyle, nX, nY, nWidth, nHeight, wId};
 			AddData(&item, sizeof(item));
 		}
 		else
@@ -3315,7 +3316,7 @@ public:
 			LPDLGTEMPLATE dlg = (LPDLGTEMPLATE)m_pData;
 			dlg->cdit++;
 
-			DLGITEMTEMPLATE item = {ATL::CControlWinTraits::GetWndStyle(0) | dwStyle, ATL::CControlWinTraits::GetWndExStyle(0) | dwExStyle, nX, nY, nWidth, nHeight, wId};
+			DLGITEMTEMPLATE item = {TWinTraits::GetWndStyle(0) | dwStyle, TWinTraits::GetWndExStyle(0) | dwExStyle, nX, nY, nWidth, nHeight, wId};
 			AddData(&item, sizeof(item));
 		}
 
@@ -3422,6 +3423,8 @@ public:
 	LPBYTE m_pPtr;
 	SIZE_T m_cAllocated;
 };
+
+typedef CMemDlgTemplateT<ATL::CControlWinTraits>	CMemDlgTemplate;
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -3629,6 +3632,7 @@ public:
 		ATLASSERT(FALSE);   // MUST be defined in derived class
 	}
 };
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // CPropertySheetWindow - client side for a property sheet
