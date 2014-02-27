@@ -3437,7 +3437,7 @@ public:
 	HBITMAP m_hBmpOld;
 
 // Constructor/destructor
-	CMemoryDC(HDC hDC, RECT& rcPaint) : m_hDCOriginal(hDC), m_hBmpOld(NULL)
+	CMemoryDC(HDC hDC, const RECT& rcPaint) : m_hDCOriginal(hDC), m_hBmpOld(NULL)
 	{
 		m_rcPaint = rcPaint;
 		CreateCompatibleDC(m_hDCOriginal);
