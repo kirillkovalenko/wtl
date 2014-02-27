@@ -4749,6 +4749,8 @@ public:
 	void ShowTabControl(bool bShow)
 	{
 		m_tab.ShowWindow(bShow ? SW_SHOWNOACTIVATE : SW_HIDE);
+		T* pT = static_cast<T*>(this);
+		pT->UpdateLayout();
 	}
 
 	void UpdateLayout()
@@ -4756,11 +4758,15 @@ public:
 		RECT rect;
 		GetClientRect(&rect);
 
+		int cyOffset = 0;
 		if(m_tab.IsWindow() && ((m_tab.GetStyle() & WS_VISIBLE) != 0))
+		{
 			m_tab.SetWindowPos(NULL, 0, 0, rect.right - rect.left, m_cyTabHeight, SWP_NOZORDER);
+			cyOffset = m_cyTabHeight;
+		}
 
 		if(m_nActivePage != -1)
-			::SetWindowPos(GetPageHWND(m_nActivePage), NULL, 0, m_cyTabHeight, rect.right - rect.left, rect.bottom - rect.top - m_cyTabHeight, SWP_NOZORDER);
+			::SetWindowPos(GetPageHWND(m_nActivePage), NULL, 0, cyOffset, rect.right - rect.left, rect.bottom - rect.top - cyOffset, SWP_NOZORDER);
 	}
 
 	void UpdateMenu()
