@@ -5904,10 +5904,10 @@ public:
 		return AddButton(0, BTNS_SEP, 0, cxWidth, (INT_PTR)0, 0);
 	}
 
-	UINT CommandToIndex(UINT nID) const
+	int CommandToIndex(UINT nID) const
 	{
 		ATLASSERT(::IsWindow(m_hWnd));
-		return (UINT)::SendMessage(m_hWnd, TB_COMMANDTOINDEX, nID, 0L);
+		return (int)::SendMessage(m_hWnd, TB_COMMANDTOINDEX, nID, 0L);
 	}
 
 #ifndef _WIN32_WCE
