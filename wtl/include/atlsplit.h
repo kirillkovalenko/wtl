@@ -67,7 +67,7 @@ public:
 	HWND m_hWndPane[m_nPanesCount];
 	RECT m_rcSplitter;
 	int m_xySplitterPos;            // splitter bar position
-	int m_xySplitterPosNew;         // new position while moving
+	int m_xySplitterPosNew;         // internal - new position while moving
 	HWND m_hWndFocusSave;
 	int m_nDefActivePane;
 	int m_cxySplitBar;              // splitter bar width/height
@@ -75,13 +75,13 @@ public:
 	int m_cxyMin;                   // minimum pane size
 	int m_cxyBarEdge;              	// splitter bar edge
 	bool m_bFullDrag;
-	int m_cxyDragOffset;
+	int m_cxyDragOffset;		// internal
 	int m_nProportionalPos;
 	bool m_bUpdateProportionalPos;
 	DWORD m_dwExtendedStyle;        // splitter specific extended styles
 	int m_nSinglePane;              // single pane mode
 	int m_xySplitterDefPos;         // default position
-	int m_bProportionalDefPos;      // porportinal def pos
+	bool m_bProportionalDefPos;     // porportinal def pos
 
 // Constructor
 	CSplitterImpl(bool bVertical = true) : 
@@ -187,7 +187,7 @@ public:
 
 	void SetSplitterPosPct(int nPct, bool bUpdate = true)
 	{
-		ATLASSERT(nPct >= 0 && nPct <= 100);
+		ATLASSERT((nPct >= 0) && (nPct <= 100));
 
 		m_nProportionalPos = ::MulDiv(nPct, m_nPropMax, 100);
 		UpdateProportionalPos();
@@ -203,13 +203,13 @@ public:
 
 	bool SetSinglePaneMode(int nPane = SPLIT_PANE_NONE)
 	{
-		ATLASSERT(nPane == SPLIT_PANE_LEFT || nPane == SPLIT_PANE_RIGHT || nPane == SPLIT_PANE_NONE);
-		if(!(nPane == SPLIT_PANE_LEFT || nPane == SPLIT_PANE_RIGHT || nPane == SPLIT_PANE_NONE))
+		ATLASSERT((nPane == SPLIT_PANE_LEFT) || (nPane == SPLIT_PANE_RIGHT) || (nPane == SPLIT_PANE_NONE));
+		if(!((nPane == SPLIT_PANE_LEFT) || (nPane == SPLIT_PANE_RIGHT) || (nPane == SPLIT_PANE_NONE)))
 			return false;
 
 		if(nPane != SPLIT_PANE_NONE)
 		{
-			if(!::IsWindowVisible(m_hWndPane[nPane]))
+			if(::IsWindowVisible(m_hWndPane[nPane]) == FALSE)
 				::ShowWindow(m_hWndPane[nPane], SW_SHOW);
 			int nOtherPane = (nPane == SPLIT_PANE_LEFT) ? SPLIT_PANE_RIGHT : SPLIT_PANE_LEFT;
 			::ShowWindow(m_hWndPane[nOtherPane], SW_HIDE);
@@ -224,6 +224,7 @@ public:
 
 		m_nSinglePane = nPane;
 		UpdateSplitterLayout();
+
 		return true;
 	}
 
@@ -244,14 +245,16 @@ public:
 			m_dwExtendedStyle = dwExtendedStyle;
 		else
 			m_dwExtendedStyle = (m_dwExtendedStyle & ~dwMask) | (dwExtendedStyle & dwMask);
+
 #ifdef _DEBUG
 		if(IsProportional() && IsRightAligned())
 			ATLTRACE2(atlTraceUI, 0, _T("CSplitterImpl::SetSplitterExtendedStyle - SPLIT_PROPORTIONAL and SPLIT_RIGHTALIGNED are mutually exclusive, defaulting to SPLIT_PROPORTIONAL.\n"));
 #endif // _DEBUG
+
 		return dwPrevStyle;
 	}
 
-	void SetSplitterDefaultPos(int xyPos)
+	void SetSplitterDefaultPos(int xyPos = -1)
 	{
 		m_xySplitterDefPos = xyPos;
 		m_bProportionalDefPos = false;
@@ -270,43 +273,45 @@ public:
 	{
 		m_hWndPane[SPLIT_PANE_LEFT] = hWndLeftTop;
 		m_hWndPane[SPLIT_PANE_RIGHT] = hWndRightBottom;
-		ATLASSERT(m_hWndPane[SPLIT_PANE_LEFT] == NULL || m_hWndPane[SPLIT_PANE_RIGHT] == NULL || m_hWndPane[SPLIT_PANE_LEFT] != m_hWndPane[SPLIT_PANE_RIGHT]);
+		ATLASSERT((m_hWndPane[SPLIT_PANE_LEFT] == NULL) || (m_hWndPane[SPLIT_PANE_RIGHT] == NULL) || (m_hWndPane[SPLIT_PANE_LEFT] != m_hWndPane[SPLIT_PANE_RIGHT]));
 		if(bUpdate)
 			UpdateSplitterLayout();
 	}
 
 	bool SetSplitterPane(int nPane, HWND hWnd, bool bUpdate = true)
 	{
-		ATLASSERT(nPane == SPLIT_PANE_LEFT || nPane == SPLIT_PANE_RIGHT);
-
-		if(nPane != SPLIT_PANE_LEFT && nPane != SPLIT_PANE_RIGHT)
+		ATLASSERT((nPane == SPLIT_PANE_LEFT) || (nPane == SPLIT_PANE_RIGHT));
+		if((nPane != SPLIT_PANE_LEFT) && (nPane != SPLIT_PANE_RIGHT))
 			return false;
+
 		m_hWndPane[nPane] = hWnd;
-		ATLASSERT(m_hWndPane[SPLIT_PANE_LEFT] == NULL || m_hWndPane[SPLIT_PANE_RIGHT] == NULL || m_hWndPane[SPLIT_PANE_LEFT] != m_hWndPane[SPLIT_PANE_RIGHT]);
+		ATLASSERT((m_hWndPane[SPLIT_PANE_LEFT] == NULL) || (m_hWndPane[SPLIT_PANE_RIGHT] == NULL) || (m_hWndPane[SPLIT_PANE_LEFT] != m_hWndPane[SPLIT_PANE_RIGHT]));
 		if(bUpdate)
 			UpdateSplitterLayout();
+
 		return true;
 	}
 
 	HWND GetSplitterPane(int nPane) const
 	{
-		ATLASSERT(nPane == SPLIT_PANE_LEFT || nPane == SPLIT_PANE_RIGHT);
-
-		if(nPane != SPLIT_PANE_LEFT && nPane != SPLIT_PANE_RIGHT)
+		ATLASSERT((nPane == SPLIT_PANE_LEFT) || (nPane == SPLIT_PANE_RIGHT));
+		if((nPane != SPLIT_PANE_LEFT) && (nPane != SPLIT_PANE_RIGHT))
 			return false;
+
 		return m_hWndPane[nPane];
 	}
 
 	bool SetActivePane(int nPane)
 	{
-		ATLASSERT(nPane == SPLIT_PANE_LEFT || nPane == SPLIT_PANE_RIGHT);
+		ATLASSERT((nPane == SPLIT_PANE_LEFT) || (nPane == SPLIT_PANE_RIGHT));
+		if((nPane != SPLIT_PANE_LEFT) && (nPane != SPLIT_PANE_RIGHT))
+			return false;
+		if((m_nSinglePane != SPLIT_PANE_NONE) && (nPane != m_nSinglePane))
+			return false;
 
-		if(nPane != SPLIT_PANE_LEFT && nPane != SPLIT_PANE_RIGHT)
-			return false;
-		if(m_nSinglePane != SPLIT_PANE_NONE && nPane != m_nSinglePane)
-			return false;
 		::SetFocus(m_hWndPane[nPane]);
 		m_nDefActivePane = nPane;
+
 		return true;
 	}
 
@@ -318,13 +323,14 @@ public:
 		{
 			for(int nPane = 0; nPane < m_nPanesCount; nPane++)
 			{
-				if(hWndFocus == m_hWndPane[nPane] || ::IsChild(m_hWndPane[nPane], hWndFocus))
+				if((hWndFocus == m_hWndPane[nPane]) || (::IsChild(m_hWndPane[nPane], hWndFocus) != FALSE))
 				{
 					nRet = nPane;
 					break;
 				}
 			}
 		}
+
 		return nRet;
 	}
 
@@ -346,16 +352,18 @@ public:
 				break;
 			}
 		}
+
 		return SetActivePane(nPane);
 	}
 
 	bool SetDefaultActivePane(int nPane)
 	{
-		ATLASSERT(nPane == SPLIT_PANE_LEFT || nPane == SPLIT_PANE_RIGHT);
-
-		if(nPane != SPLIT_PANE_LEFT && nPane != SPLIT_PANE_RIGHT)
+		ATLASSERT((nPane == SPLIT_PANE_LEFT) || (nPane == SPLIT_PANE_RIGHT));
+		if((nPane != SPLIT_PANE_LEFT) && (nPane != SPLIT_PANE_RIGHT))
 			return false;
+
 		m_nDefActivePane = nPane;
+
 		return true;
 	}
 
@@ -369,6 +377,7 @@ public:
 				return true;
 			}
 		}
+
 		return false;   // not found
 	}
 
@@ -380,7 +389,7 @@ public:
 	void DrawSplitter(CDCHandle dc)
 	{
 		ATLASSERT(dc.m_hDC != NULL);
-		if(m_nSinglePane == SPLIT_PANE_NONE && m_xySplitterPos == -1)
+		if((m_nSinglePane == SPLIT_PANE_NONE) && (m_xySplitterPos == -1))
 			return;
 
 		T* pT = static_cast<T*>(this);
@@ -537,7 +546,7 @@ public:
 		T* pT = static_cast<T*>(this);
 
 		// try setting position if not set
-		if(m_nSinglePane == SPLIT_PANE_NONE && m_xySplitterPos == -1)
+		if((m_nSinglePane == SPLIT_PANE_NONE) && (m_xySplitterPos == -1))
 			pT->SetSplitterPos();
 
 		// do painting
@@ -557,7 +566,7 @@ public:
 	LRESULT OnSetCursor(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 	{
 		T* pT = static_cast<T*>(this);
-		if((HWND)wParam == pT->m_hWnd && LOWORD(lParam) == HTCLIENT)
+		if(((HWND)wParam == pT->m_hWnd) && (LOWORD(lParam) == HTCLIENT))
 		{
 			DWORD dwPos = ::GetMessagePos();
 			POINT ptPos = { GET_X_LPARAM(dwPos), GET_Y_LPARAM(dwPos) };
@@ -698,7 +707,7 @@ public:
 					::GetCursorPos(&pt);
 					int xyPos = m_xySplitterPos + ((wParam == VK_LEFT) ? -pT->m_cxyStep : pT->m_cxyStep);
 					int cxyMax = m_rcSplitter.right - m_rcSplitter.left;
-					if(xyPos < m_cxyMin + m_cxyBarEdge)
+					if(xyPos < (m_cxyMin + m_cxyBarEdge))
 						xyPos = m_cxyMin;
 					else if(xyPos > (cxyMax - m_cxySplitBar - m_cxyBarEdge - m_cxyMin))
 						xyPos = cxyMax - m_cxySplitBar - m_cxyBarEdge - m_cxyMin;
@@ -714,7 +723,7 @@ public:
 					::GetCursorPos(&pt);
 					int xyPos = m_xySplitterPos + ((wParam == VK_UP) ? -pT->m_cxyStep : pT->m_cxyStep);
 					int cxyMax = m_rcSplitter.bottom - m_rcSplitter.top;
-					if(xyPos < m_cxyMin + m_cxyBarEdge)
+					if(xyPos < (m_cxyMin + m_cxyBarEdge))
 						xyPos = m_cxyMin;
 					else if(xyPos > (cxyMax - m_cxySplitBar - m_cxyBarEdge - m_cxyMin))
 						xyPos = cxyMax - m_cxySplitBar - m_cxyBarEdge - m_cxyMin;
@@ -741,7 +750,7 @@ public:
 		{
 			if(m_nSinglePane == SPLIT_PANE_NONE)
 			{
-				if(m_nDefActivePane == SPLIT_PANE_LEFT || m_nDefActivePane == SPLIT_PANE_RIGHT)
+				if((m_nDefActivePane == SPLIT_PANE_LEFT) || (m_nDefActivePane == SPLIT_PANE_RIGHT))
 					::SetFocus(m_hWndPane[m_nDefActivePane]);
 			}
 			else
@@ -759,7 +768,7 @@ public:
 	{
 		T* pT = static_cast<T*>(this);
 		LRESULT lRet = pT->DefWindowProc(uMsg, wParam, lParam);
-		if(lRet == MA_ACTIVATE || lRet == MA_ACTIVATEANDEAT)
+		if((lRet == MA_ACTIVATE) || (lRet == MA_ACTIVATEANDEAT))
 		{
 			DWORD dwPos = ::GetMessagePos();
 			POINT pt = { GET_X_LPARAM(dwPos), GET_Y_LPARAM(dwPos) };
@@ -767,7 +776,7 @@ public:
 			RECT rcPane = { 0 };
 			for(int nPane = 0; nPane < m_nPanesCount; nPane++)
 			{
-				if(GetSplitterPaneRect(nPane, &rcPane) && ::PtInRect(&rcPane, pt))
+				if(GetSplitterPaneRect(nPane, &rcPane) && (::PtInRect(&rcPane, pt) != FALSE))
 				{
 					m_nDefActivePane = nPane;
 					break;
@@ -790,7 +799,7 @@ public:
 // Implementation - internal helpers
 	void UpdateSplitterLayout()
 	{
-		if(m_nSinglePane == SPLIT_PANE_NONE && m_xySplitterPos == -1)
+		if((m_nSinglePane == SPLIT_PANE_NONE) && (m_xySplitterPos == -1))
 			return;
 
 		T* pT = static_cast<T*>(this);
@@ -826,7 +835,7 @@ public:
 	bool GetSplitterBarRect(LPRECT lpRect) const
 	{
 		ATLASSERT(lpRect != NULL);
-		if(m_nSinglePane != SPLIT_PANE_NONE || m_xySplitterPos == -1)
+		if((m_nSinglePane != SPLIT_PANE_NONE) || (m_xySplitterPos == -1))
 			return false;
 
 		if(m_bVertical)
@@ -849,7 +858,7 @@ public:
 
 	bool GetSplitterPaneRect(int nPane, LPRECT lpRect) const
 	{
-		ATLASSERT(nPane == SPLIT_PANE_LEFT || nPane == SPLIT_PANE_RIGHT);
+		ATLASSERT((nPane == SPLIT_PANE_LEFT) || (nPane == SPLIT_PANE_RIGHT));
 		ATLASSERT(lpRect != NULL);
 		bool bRet = true;
 		if(m_nSinglePane != SPLIT_PANE_NONE)
@@ -897,6 +906,7 @@ public:
 		{
 			bRet = false;
 		}
+
 		return bRet;
 	}
 
@@ -911,10 +921,11 @@ public:
 	{
 		if(m_nSinglePane != SPLIT_PANE_NONE)
 			return false;
-		if(m_xySplitterPos == -1 || !IsOverSplitterRect(x, y))
+		if((m_xySplitterPos == -1) || !IsOverSplitterRect(x, y))
 			return false;
 		int xy = m_bVertical ? x : y;
 		int xyOff = m_bVertical ? m_rcSplitter.left : m_rcSplitter.top;
+
 		return ((xy >= (xyOff + m_xySplitterPos)) && (xy < xyOff + m_xySplitterPos + m_cxySplitBar + m_cxyBarEdge));
 	}
 
@@ -954,7 +965,7 @@ public:
 		}
 
 		T* pT = static_cast<T*>(this);
-		if((pT->GetExStyle() & WS_EX_CLIENTEDGE))
+		if((pT->GetExStyle() & WS_EX_CLIENTEDGE) != 0)
 		{
 			m_cxyBarEdge = 2 * ::GetSystemMetrics(m_bVertical ? SM_CXEDGE : SM_CYEDGE);
 			m_cxyMin = 0;
