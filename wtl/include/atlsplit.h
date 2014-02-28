@@ -78,15 +78,18 @@ public:
 	int m_cxyDragOffset;
 	int m_nProportionalPos;
 	bool m_bUpdateProportionalPos;
-	DWORD m_dwExtendedStyle;       // splitter specific extended styles
-	int m_nSinglePane;             // single pane mode
+	DWORD m_dwExtendedStyle;        // splitter specific extended styles
+	int m_nSinglePane;              // single pane mode
+	int m_xySplitterDefPos;         // default position
+	int m_bProportionalDefPos;      // porportinal def pos
 
 // Constructor
 	CSplitterImpl(bool bVertical = true) : 
 	              m_bVertical(bVertical), m_xySplitterPos(-1), m_xySplitterPosNew(-1), m_hWndFocusSave(NULL), 
 	              m_nDefActivePane(SPLIT_PANE_NONE), m_cxySplitBar(4), m_hCursor(NULL), m_cxyMin(0), m_cxyBarEdge(0), 
 	              m_bFullDrag(true), m_cxyDragOffset(0), m_nProportionalPos(0), m_bUpdateProportionalPos(true),
-	              m_dwExtendedStyle(SPLIT_PROPORTIONAL), m_nSinglePane(SPLIT_PANE_NONE)
+	              m_dwExtendedStyle(SPLIT_PROPORTIONAL), m_nSinglePane(SPLIT_PANE_NONE), 
+	              m_xySplitterDefPos(-1), m_bProportionalDefPos(false)
 	{
 		m_hWndPane[SPLIT_PANE_LEFT] = NULL;
 		m_hWndPane[SPLIT_PANE_RIGHT] = NULL;
@@ -124,12 +127,28 @@ public:
 
 	bool SetSplitterPos(int xyPos = -1, bool bUpdate = true)
 	{
-		if(xyPos == -1)   // -1 == middle
+		if(xyPos == -1)   // -1 == default position
 		{
-			if(m_bVertical)
-				xyPos = (m_rcSplitter.right - m_rcSplitter.left - m_cxySplitBar - m_cxyBarEdge) / 2;
-			else
-				xyPos = (m_rcSplitter.bottom - m_rcSplitter.top - m_cxySplitBar - m_cxyBarEdge) / 2;
+			if(m_bProportionalDefPos)
+			{
+				ATLASSERT((m_xySplitterDefPos >= 0) && (m_xySplitterDefPos <= m_nPropMax));
+
+				if(m_bVertical)
+					xyPos = ::MulDiv(m_xySplitterDefPos, m_rcSplitter.right - m_rcSplitter.left - m_cxySplitBar - m_cxyBarEdge, m_nPropMax);
+				else
+					xyPos = ::MulDiv(m_xySplitterDefPos, m_rcSplitter.bottom - m_rcSplitter.top - m_cxySplitBar - m_cxyBarEdge, m_nPropMax);
+			}
+			else if(m_xySplitterDefPos != -1)
+			{
+				xyPos = m_xySplitterDefPos;
+			}
+			else   // not set, use middle position
+			{
+				if(m_bVertical)
+					xyPos = (m_rcSplitter.right - m_rcSplitter.left - m_cxySplitBar - m_cxyBarEdge) / 2;
+				else
+					xyPos = (m_rcSplitter.bottom - m_rcSplitter.top - m_cxySplitBar - m_cxyBarEdge) / 2;
+			}
 		}
 
 		// Adjust if out of valid range
@@ -230,6 +249,20 @@ public:
 			ATLTRACE2(atlTraceUI, 0, _T("CSplitterImpl::SetSplitterExtendedStyle - SPLIT_PROPORTIONAL and SPLIT_RIGHTALIGNED are mutually exclusive, defaulting to SPLIT_PROPORTIONAL.\n"));
 #endif // _DEBUG
 		return dwPrevStyle;
+	}
+
+	void SetSplitterDefaultPos(int xyPos)
+	{
+		m_xySplitterDefPos = xyPos;
+		m_bProportionalDefPos = false;
+	}
+
+	void SetSplitterDefaultPosPct(int nPct)
+	{
+		ATLASSERT((nPct >= 0) && (nPct <= 100));
+
+		m_xySplitterDefPos = ::MulDiv(nPct, m_nPropMax, 100);
+		m_bProportionalDefPos = true;
 	}
 
 // Splitter operations
@@ -550,7 +583,7 @@ public:
 			else
 				xyNewSplitPos = yPos - m_rcSplitter.top - m_cxyDragOffset;
 
-			if(xyNewSplitPos == -1)   // avoid -1, that means middle
+			if(xyNewSplitPos == -1)   // avoid -1, that means default position
 				xyNewSplitPos = -2;
 
 			if(m_xySplitterPos != xyNewSplitPos)
@@ -621,7 +654,7 @@ public:
 	LRESULT OnLButtonDoubleClick(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
 	{
 		T* pT = static_cast<T*>(this);
-		pT->SetSplitterPos();   // middle
+		pT->SetSplitterPos();   // default
 
 		return 0;
 	}
