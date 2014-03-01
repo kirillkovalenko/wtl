@@ -26,7 +26,7 @@
   <tr>
     <td class="style3">
 	<p style="text-align: left"><font face="Arial"><b>Windows Template Library - WTL Version 9.0</b></font><font face="Arial" size="2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
-	(build 4035) 2/4/2014</font></td>
+	(build 4059) 2/28/2014</font></td>
   </tr>
   <tr>
     <td><hr></td>
@@ -134,10 +134,9 @@ structure, or unpack the archive file, to the location of your choice. Please be
 directory</b> to the list of include directories in VC++, so that the compiler 
 can find them when you include them in your projects..</font></p>
 <p style=margin:0in>&nbsp;</p>
-<p style=margin:0in><font face="Arial" size="2">Setup programs for the AppWizard are provided. After executing the setup scripts, ATL/WTL AppWizard will appear in the list of AppWizards when you select File.New.Project 
-in VC++ IDE. The file AppWiz\setup70.js is the setup script for VC++ .NET 2002, AppWiz\setup71.js is for VC++ 
-.NET 2003, and AppWiz\setup80.js is for VC++ 2005. AppWizCE\setup80.js is setup 
-script for VC++ 2005 SmartDevice projects.</font></p>
+<p style=margin:0in><font face="Arial" size="2">Setup programs for the AppWizard are provided. After executing the setup script, ATL/WTL AppWizard will appear in the list of AppWizards when you select File.New.Project 
+in VC++ IDE. The file AppWiz\setup.js is the setup script for all supported versions of Visual Studio, while 
+AppWizards for Windows CE have separate scripts for VS2005 and VS2008 SmartDevice projects.</font></p>
 <p style=margin:0in>&nbsp;</p>
 <p style=margin:0in><font face="Arial" size="2">To manually install AppWizard 
 for VC++ .NET 2002/2003, copy all WTLAppWiz.* files from AppWiz\Files to VC++ .NET 
@@ -387,64 +386,9 @@ Windows Mobile 6.0 (Standard and Professional)</font></p>
     <td width="494" colspan="2"><font face="Arial" size="2">AppWiz\</font></td>
   </tr>
 	<tr>
-    <td width="136"><font face="Arial" size="2">&nbsp;&nbsp;&nbsp; setup70.js</font></td>
-    <td width="358"><font face="Arial" size="2">AppWizard setup program for VC++ 
-    .NET 2002</font></td>
-  </tr>
-	<tr>
-    <td width="136"><font face="Arial" size="2">&nbsp;&nbsp;&nbsp; setup71.js</font></td>
-    <td width="358"><font face="Arial" size="2">AppWizard setup program for VC++ 
-    .NET 2003</font></td>
-  </tr>
-	<tr>
-    <td width="136"><font face="Arial" size="2">&nbsp;&nbsp;&nbsp; setup80.js</font></td>
-    <td width="358"><font face="Arial" size="2">AppWizard setup program for VC++ 
-    2005</font></td>
-  </tr>
-	<tr>
-    <td width="136"><font face="Arial" size="2">&nbsp;&nbsp;&nbsp; setup80x.js</font></td>
-    <td width="358"><font face="Arial" size="2">AppWizard setup program for VC++ 
-    2005 Express</font></td>
-  </tr>
-	<tr>
-    <td width="136"><font face="Arial" size="2">&nbsp;&nbsp;&nbsp; setup90.js</font></td>
-    <td width="358"><font face="Arial" size="2">AppWizard setup program for VC++ 
-    2008</font></td>
-  </tr>
-	<tr>
-    <td width="136"><font face="Arial" size="2">&nbsp;&nbsp;&nbsp; setup90x.js</font></td>
-    <td width="358"><font face="Arial" size="2">AppWizard setup program for VC++ 
-    2008 Express</font></td>
-  </tr>
-	<tr>
-    <td width="136"><font face="Arial" size="2">&nbsp;&nbsp;&nbsp; setup100.js</font></td>
-    <td width="358"><font face="Arial" size="2">AppWizard setup program for VC++ 
-    2010</font></td>
-  </tr>
-	<tr>
-    <td width="136"><font face="Arial" size="2">&nbsp;&nbsp;&nbsp; setup100x.js</font></td>
-    <td width="358"><font face="Arial" size="2">AppWizard setup program for VC++ 
-    2010 Express</font></td>
-  </tr>
-	<tr>
-    <td width="136"><font face="Arial" size="2">&nbsp;&nbsp;&nbsp; setup110.js</font></td>
-    <td width="358"><font face="Arial" size="2">AppWizard setup program for VC++ 
-    2012</font></td>
-  </tr>
-	<tr>
-    <td width="136"><font face="Arial" size="2">&nbsp;&nbsp;&nbsp; setup110x.js</font></td>
-    <td width="358"><font face="Arial" size="2">AppWizard setup program for VC++ 
-    2012 Express</font></td>
-  </tr>
-	<tr>
-    <td width="136"><font face="Arial" size="2">&nbsp;&nbsp;&nbsp; setup120.js</font></td>
-    <td width="358"><font face="Arial" size="2">AppWizard setup program for VC++ 
-    2013</font></td>
-  </tr>
-	<tr>
-    <td width="136"><font face="Arial" size="2">&nbsp;&nbsp;&nbsp; setup120x.js</font></td>
-    <td width="358"><font face="Arial" size="2">AppWizard setup program for VC++ 
-    2013 Express</font></td>
+    <td width="136"><font face="Arial" size="2">&nbsp;&nbsp;&nbsp; setup.js</font></td>
+    <td width="358"><font face="Arial" size="2">AppWizard setup program for all versions of 
+    Visual Studio</font></td>
   </tr>
 	<tr>
     <td width="136"><font face="Arial" size="2">&nbsp;&nbsp;&nbsp; Files\...</font></td>
@@ -1734,7 +1678,7 @@ C++ Express Edition (2005/2008/2010) to build projects. Since Visual C++ Express
 to use a version of ATL that ships with the Platform SDK.</font></p>
 <p style=margin:0in>&nbsp;</p>
 <p style=margin:0in><font face="Arial" size="2">The WTL App Wizard can be 
-installed by running AppWiz\setup80x.js (or setup90x.js or setup100x.js) program. The App Wizard generates code 
+installed by running AppWiz\setup.js program. The App Wizard generates code 
 in the stdafx.h file that allows use of ATL3 from the Platform SDK. That code is 
 used if _WTL_SUPPORT_EXTERNAL_ATL is defined, so you can comment the line in stdafx.h 
 that defines _WTL_SUPPORT_EXTERNAL_ATL to use the project with different versions of 
