@@ -9,7 +9,7 @@
 // the terms of this license. You must not remove this notice, or
 // any other, from this software.
 
-// Setup program for the WTL App Wizard for VC++ 12.0 Express
+// WTL App Wizard universal setup program for Visual Studio
 
 main();
 
@@ -46,7 +46,7 @@ function main()
 		Shell.ShellExecute(WScript.FullName, strParams, null, "RunAs");
 		return;
 	}
-	
+
 	// Create shell object
 	var WSShell = WScript.CreateObject("WScript.Shell");
 	// Create file system object
@@ -67,34 +67,149 @@ function main()
 		return;
 	}
 
-	try
+	MessageBox(WSShell, "Setup will search for installed versions of Visual Studio,\nand ask to add the WTL App Wizard for each of them.");
+
+	var strRegKey_32 = "HKLM\\Software\\";
+	var strRegKey_64 = "HKLM\\Software\\Wow6432Node\\";
+
+	var nVersions = 12;
+
+	var astrRegKeyVer = new Array();
+	astrRegKeyVer[0] = "Microsoft\\VisualStudio\\7.0\\Setup\\VC\\ProductDir";
+	astrRegKeyVer[1] = "Microsoft\\VisualStudio\\7.1\\Setup\\VC\\ProductDir";
+	astrRegKeyVer[2] = "Microsoft\\VisualStudio\\8.0\\Setup\\VC\\ProductDir";
+	astrRegKeyVer[3] = "Microsoft\\VisualStudio\\9.0\\Setup\\VC\\ProductDir";
+	astrRegKeyVer[4] = "Microsoft\\VisualStudio\\10.0\\Setup\\VC\\ProductDir";
+	astrRegKeyVer[5] = "Microsoft\\VisualStudio\\11.0\\Setup\\VC\\ProductDir";
+	astrRegKeyVer[6] = "Microsoft\\VisualStudio\\12.0\\Setup\\VC\\ProductDir";
+	astrRegKeyVer[7] = "Microsoft\\VCExpress\\8.0\\Setup\\VC\\ProductDir";
+	astrRegKeyVer[8] = "Microsoft\\VCExpress\\9.0\\Setup\\VC\\ProductDir";
+	astrRegKeyVer[9] = "Microsoft\\VCExpress\\10.0\\Setup\\VC\\ProductDir";
+	astrRegKeyVer[10] = "Microsoft\\VCExpress\\11.0\\Setup\\VC\\ProductDir";
+	astrRegKeyVer[11] = "Microsoft\\VCExpress\\12.0\\Setup\\VC\\ProductDir";
+
+	var astrFolder = new Array();
+	astrFolder[0] = "vcprojects";
+	astrFolder[1] = "vcprojects";
+	astrFolder[2] = "vcprojects";
+	astrFolder[3] = "vcprojects";
+	astrFolder[4] = "vcprojects";
+	astrFolder[5] = "vcprojects";
+	astrFolder[6] = "vcprojects";
+	astrFolder[7] = "Express\\vcprojects";
+	astrFolder[8] = "Express\\vcprojects";
+	astrFolder[9] = "Express\\vcprojects";
+	astrFolder[10] = "vcprojects_WDExpress";
+	astrFolder[11] = "vcprojects_WDExpress";
+
+	var astrVersions = new Array();
+	astrVersions[0] = "Visual Studio 2002 (7.0)";
+	astrVersions[1] = "Visual Studio 2003 (7.1)";
+	astrVersions[2] = "Visual Studio 2005 (8.0)";
+	astrVersions[3] = "Visual Studio 2008 (9.0)";
+	astrVersions[4] = "Visual Studio 2010 (10.0)";
+	astrVersions[5] = "Visual Studio 2012 (11.0)";
+	astrVersions[6] = "Visual Studio 2013 (12.0)";
+	astrVersions[7] = "Visual Studio 2005 Express (8.0)";
+	astrVersions[8] = "Visual Studio 2008 Express (9.0)";
+	astrVersions[9] = "Visual Studio 2010 Express (10.0)";
+	astrVersions[10] = "Visual Studio 2012 Express (11.0)";
+	astrVersions[11] = "Visual Studio 2013 Express (12.0)";
+
+	var abExpress = new Array();
+	abExpress[0] = false;
+	abExpress[1] = false;
+	abExpress[2] = false;
+	abExpress[3] = false;
+	abExpress[4] = false;
+	abExpress[5] = false;
+	abExpress[6] = false;
+	abExpress[7] = true;
+	abExpress[8] = true;
+	abExpress[9] = true;
+	abExpress[10] = true;
+	abExpress[11] = true;
+
+	var astrWizVer = new Array();
+	astrWizVer[0] = "7.0";
+	astrWizVer[1] = "7.1";
+	astrWizVer[2] = "8.0";
+	astrWizVer[3] = "9.0";
+	astrWizVer[4] = "10.0";
+	astrWizVer[5] = "11.0";
+	astrWizVer[6] = "12.0";
+	astrWizVer[7] = "8.0";
+	astrWizVer[8] = "9.0";
+	astrWizVer[9] = "10.0";
+	astrWizVer[10] = "11.0";
+	astrWizVer[11] = "12.0";
+
+	var nSpecial = 4;
+
+	var nWizSpecial = 0;
+
+	var bFound = false;
+	for(var i = 0; i < nVersions; i++)
 	{
-		var strVCKey = "HKLM\\Software\\Microsoft\\VCExpress\\12.0\\Setup\\VC\\ProductDir";
-		strValue = WSShell.RegRead(strVCKey);
-	}
-	catch(e)
-	{
+		if(bDebug)
+			WScript.Echo("Looking for: " + astrVersions[i]);
+
 		try
 		{
-			var strVCKey_x64 = "HKLM\\Software\\Wow6432Node\\Microsoft\\VCExpress\\12.0\\Setup\\VC\\ProductDir";
-			strValue = WSShell.RegRead(strVCKey_x64);
+			var strVCKey = strRegKey_32 + astrRegKeyVer[i];
+			strValue = WSShell.RegRead(strVCKey);
 		}
 		catch(e)
 		{
-			WScript.Echo("ERROR: Cannot find where Visual C++ 12.0 Express is installed.");
-			return;
+			try
+			{
+				var strVCKey_x64 = strRegKey_64 + astrRegKeyVer[i];
+				strValue = WSShell.RegRead(strVCKey_x64);
+			}
+			catch(e)
+			{
+				continue;
+			}
+		}
+
+		var strDestFolder = FileSys.BuildPath(strValue, astrFolder[i]);
+		if(bDebug)
+			WScript.Echo("Destination: " + strDestFolder);
+		if(!FileSys.FolderExists(strDestFolder))
+			continue;
+
+		if(i == nSpecial)   // special case for VS2010
+		{
+			var strCheckFile = FileSys.BuildPath(strDestFolder, "vc.vsdir");
+			if(!FileSys.FileExists(strCheckFile))
+				continue;
+		}
+
+		bFound = true;
+		var strMsg = "Found: " + astrVersions[i] + "\n\nInstall WTL App Wizard?";
+		var bRet = MessageBox(WSShell, strMsg, true);
+		if(bRet)
+		{
+			var bWizSpecial = (i == nWizSpecial);   // special case for VS2002
+			SetupWizard(WSShell, FileSys, strSourceFolder, strDestFolder, astrWizVer[i], bWizSpecial, abExpress[i], bDebug);
 		}
 	}
 
-	var strDestFolder = FileSys.BuildPath(strValue, "vcprojects_WDExpress");
-	if(bDebug)
-		WScript.Echo("Destination: " + strDestFolder);
-	if(!FileSys.FolderExists(strDestFolder))
-	{
-		WScript.Echo("ERROR: Cannot find destination folder (should be: " + strDestFolder + ")");
-		return;
-	}
+	if(bFound)
+		MessageBox(WSShell, "Done!");
+	else
+		MessageBox(WSShell, "Setup could not find Visual Studio installed");
+}
 
+function MessageBox(WSShell, strText, bYesNo)
+{
+	var nType = bYesNo ? (4 + 32) : 0;   // 4 = Yes/No buttons, 32 = Questionmark icon, 0 = OK button
+	var nRetBtn = WSShell.Popup(strText, 0, "WTL App Wizard Setup", nType);
+	return (nRetBtn == 6);   // 6 = Yes;
+}
+
+function SetupWizard(WSShell, FileSys, strSourceFolder, strDestFolder, strWizVer, bWizSpecial, bExpress, bDebug)
+{
 	// Copy files
 	try
 	{
@@ -140,16 +255,17 @@ function main()
 		while(!fileSrc.AtEndOfStream)
 		{
 			var strLine = fileSrc.ReadLine();
-			if(strLine.indexOf("Wizard=VsWizard.VsWizardEngine") != -1)
-				strLine += ".12.0";
+			if(!bWizSpecial && (strLine.indexOf("Wizard=VsWizard.VsWizardEngine") != -1))
+				strLine += "." + strWizVer;
 			else if(strLine.indexOf("WIZARD_VERSION") != -1)
-				strLine = "Param=\"WIZARD_VERSION = 12.0\"";
+				strLine = "Param=\"WIZARD_VERSION = " + strWizVer + "\"";
 			else if(strLine.indexOf("ABSOLUTE_PATH") != -1)
 				strLine = "Param=\"ABSOLUTE_PATH = " + strSourceFolder + "\"";
 			fileDest.WriteLine(strLine);
 		}
 
-		fileDest.WriteLine("Param=\"VC_EXPRESS = 1\"");
+		if(bExpress)
+			fileDest.WriteLine("Param=\"VC_EXPRESS = 1\"");
 
 		fileSrc.Close();
 		fileDest.Close();
