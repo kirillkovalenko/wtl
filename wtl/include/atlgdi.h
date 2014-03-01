@@ -205,16 +205,17 @@ public:
 	}
 
 #ifndef _WIN32_WCE
-	int GetExtLogPen(EXTLOGPEN* pLogPen) const
+	int GetExtLogPen(EXTLOGPEN* pLogPen, int nSize = sizeof(EXTLOGPEN)) const
 	{
 		ATLASSERT(m_hPen != NULL);
-		return ::GetObject(m_hPen, sizeof(EXTLOGPEN), pLogPen);
+		return ::GetObject(m_hPen, nSize, pLogPen);
 	}
 
-	bool GetExtLogPen(EXTLOGPEN& ExtLogPen) const
+	bool GetExtLogPen(EXTLOGPEN& ExtLogPen, int nSize = sizeof(EXTLOGPEN)) const
 	{
 		ATLASSERT(m_hPen != NULL);
-		return (::GetObject(m_hPen, sizeof(EXTLOGPEN), &ExtLogPen) == sizeof(EXTLOGPEN));
+		int nRet = ::GetObject(m_hPen, nSize, &ExtLogPen);
+		return ((nRet > 0) && (nRet <= nSize));
 	}
 #endif // !_WIN32_WCE
 };
