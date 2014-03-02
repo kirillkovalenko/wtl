@@ -407,6 +407,16 @@ public:
 	{
 		ATLASSERT(m_hWnd == NULL);
 
+#if (_ATL_VER >= 0x0800)
+		// Allocate the thunk structure here, where we can fail gracefully.
+		BOOL bRet = m_thunk.Init(NULL, NULL);
+		if(bRet == FALSE)
+		{
+			::SetLastError(ERROR_OUTOFMEMORY);
+			return NULL;
+		}
+#endif // (_ATL_VER >= 0x0800)
+
 		if(atom == 0)
 			return NULL;
 
