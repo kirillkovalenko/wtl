@@ -319,24 +319,26 @@ function AddConfigurations(proj, strProjectName)
 			else
 				config.CharacterSet = charSetMBCS;
 
+			var WizardVersion = wizard.FindSymbol('WIZARD_VERSION');
 			if(bDebug)
 			{
-				config.IntermediateDirectory = 'Debug';
-				config.OutputDirectory = 'Debug';
+				if(WizardVersion < 8.0)
+				{
+					config.IntermediateDirectory = 'Debug';
+					config.OutputDirectory = 'Debug';
+				}
+
 				config.ATLMinimizesCRunTimeLibraryUsage = false;
 			}
 			else
 			{
-				config.IntermediateDirectory = 'Release';
-				config.OutputDirectory = 'Release';
-				config.ATLMinimizesCRunTimeLibraryUsage = true;
-			}
+				if(WizardVersion < 8.0)
+				{
+					config.IntermediateDirectory = 'Release';
+					config.OutputDirectory = 'Release';
+				}
 
-			var WizardVersion = wizard.FindSymbol('WIZARD_VERSION');
-			if(WizardVersion >= 10.0)
-			{
-				config.IntermediateDirectory += '\\';
-				config.OutputDirectory += '\\';
+				config.ATLMinimizesCRunTimeLibraryUsage = true;
 			}
 
 			if(wizard.FindSymbol("WTL_USE_VIEW") && wizard.FindSymbol("WTL_COMBO_VIEW_TYPE") == "WTL_VIEWTYPE_HTML")
