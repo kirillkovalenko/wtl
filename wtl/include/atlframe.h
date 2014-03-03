@@ -934,8 +934,6 @@ public:
 	LRESULT OnToolTipTextA(int idCtrl, LPNMHDR pnmh, BOOL& /*bHandled*/)
 	{
 		LPNMTTDISPINFOA pDispInfo = (LPNMTTDISPINFOA)pnmh;
-		pDispInfo->szText[0] = 0;
-
 		if((idCtrl != 0) && !(pDispInfo->uFlags & TTF_IDISHWND))
 		{
 			const int cchBuff = 256;
@@ -961,8 +959,6 @@ public:
 	LRESULT OnToolTipTextW(int idCtrl, LPNMHDR pnmh, BOOL& /*bHandled*/)
 	{
 		LPNMTTDISPINFOW pDispInfo = (LPNMTTDISPINFOW)pnmh;
-		pDispInfo->szText[0] = 0;
-
 		if((idCtrl != 0) && !(pDispInfo->uFlags & TTF_IDISHWND))
 		{
 			const int cchBuff = 256;
