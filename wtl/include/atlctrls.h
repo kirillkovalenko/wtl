@@ -2541,6 +2541,15 @@ public:
 		::SendMessage(m_hWnd, TTM_TRACKACTIVATE, bActivate, (LPARAM)lpToolInfo);
 	}
 
+	void TrackActivate(HWND hWnd, UINT nIDTool, BOOL bActivate)
+	{
+		ATLASSERT(::IsWindow(m_hWnd));
+		ATLASSERT(hWnd != NULL);
+
+		CToolInfo ti(0, hWnd, nIDTool);
+		::SendMessage(m_hWnd, TTM_TRACKACTIVATE, bActivate, ti);
+	}
+
 	void TrackPosition(int xPos, int yPos)
 	{
 		ATLASSERT(::IsWindow(m_hWnd));
