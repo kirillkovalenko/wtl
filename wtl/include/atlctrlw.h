@@ -41,6 +41,8 @@
   #endif
 #endif
 
+// Note: Define _WTL_CMDBAR_VISTA_STD_MENUBAR to use Vista standard menubar look with Vista menus
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Classes in this file:
@@ -1803,52 +1805,87 @@ public:
 			}
 			else if(lpTBCustomDraw->nmcd.dwDrawStage == CDDS_ITEMPREPAINT)
 			{
-				if(m_bFlatMenus)
+#if _WTL_CMDBAR_VISTA_MENUS && defined(_WTL_CMDBAR_VISTA_STD_MENUBAR)
+				if(m_bVistaMenus)
 				{
-#ifndef COLOR_MENUHILIGHT
-					const int COLOR_MENUHILIGHT = 29;
-#endif // !COLOR_MENUHILIGHT
-					bool bDisabled = ((lpTBCustomDraw->nmcd.uItemState & CDIS_DISABLED) == CDIS_DISABLED);
-					if(!bDisabled && ((lpTBCustomDraw->nmcd.uItemState & CDIS_HOT) == CDIS_HOT || 
-						(lpTBCustomDraw->nmcd.uItemState & CDIS_SELECTED) == CDIS_SELECTED))
+					::SetRectEmpty(&lpTBCustomDraw->rcText);
+					lRet = CDRF_NOTIFYPOSTPAINT;
+					bHandled = TRUE;
+				}
+				else
+#endif // _WTL_CMDBAR_VISTA_MENUS && defined(_WTL_CMDBAR_VISTA_STD_MENUBAR)
+				{
+					if(m_bFlatMenus)
 					{
-						::FillRect(lpTBCustomDraw->nmcd.hdc, &lpTBCustomDraw->nmcd.rc, ::GetSysColorBrush(COLOR_MENUHILIGHT));
-						::FrameRect(lpTBCustomDraw->nmcd.hdc, &lpTBCustomDraw->nmcd.rc, ::GetSysColorBrush(COLOR_HIGHLIGHT));
-						lpTBCustomDraw->clrText = ::GetSysColor(m_bParentActive ? COLOR_HIGHLIGHTTEXT : COLOR_GRAYTEXT);
+#ifndef COLOR_MENUHILIGHT
+						const int COLOR_MENUHILIGHT = 29;
+#endif // !COLOR_MENUHILIGHT
+						bool bDisabled = ((lpTBCustomDraw->nmcd.uItemState & CDIS_DISABLED) == CDIS_DISABLED);
+						if(!bDisabled && ((lpTBCustomDraw->nmcd.uItemState & CDIS_HOT) == CDIS_HOT || 
+							(lpTBCustomDraw->nmcd.uItemState & CDIS_SELECTED) == CDIS_SELECTED))
+						{
+							::FillRect(lpTBCustomDraw->nmcd.hdc, &lpTBCustomDraw->nmcd.rc, ::GetSysColorBrush(COLOR_MENUHILIGHT));
+							::FrameRect(lpTBCustomDraw->nmcd.hdc, &lpTBCustomDraw->nmcd.rc, ::GetSysColorBrush(COLOR_HIGHLIGHT));
+							lpTBCustomDraw->clrText = ::GetSysColor(m_bParentActive ? COLOR_HIGHLIGHTTEXT : COLOR_GRAYTEXT);
+						}
+						else if(bDisabled || !m_bParentActive)
+						{
+							lpTBCustomDraw->clrText = ::GetSysColor(COLOR_GRAYTEXT);
+						}
+
+						_ParentCustomDrawHelper(lpTBCustomDraw);
+
+						lRet = CDRF_SKIPDEFAULT;
+						bHandled = TRUE;
 					}
-					else if(bDisabled || !m_bParentActive)
+					else if(!m_bParentActive)
 					{
 						lpTBCustomDraw->clrText = ::GetSysColor(COLOR_GRAYTEXT);
+						bHandled = TRUE;
 					}
-					CDCHandle dc = lpTBCustomDraw->nmcd.hdc;
-					dc.SetTextColor(lpTBCustomDraw->clrText);
-					dc.SetBkMode(lpTBCustomDraw->nStringBkMode);
-					HFONT hFont = GetFont();
-					HFONT hFontOld = NULL;
-					if(hFont != NULL)
-						hFontOld = dc.SelectFont(hFont);
-					const int cchText = 200;
-					TCHAR szText[cchText] = { 0 };
-					TBBUTTONINFO tbbi = { 0 };
-					tbbi.cbSize = sizeof(TBBUTTONINFO);
-					tbbi.dwMask = TBIF_TEXT;
-					tbbi.pszText = szText;
-					tbbi.cchText = cchText;
-					GetButtonInfo((int)lpTBCustomDraw->nmcd.dwItemSpec, &tbbi);
-					dc.DrawText(szText, -1, &lpTBCustomDraw->nmcd.rc, DT_SINGLELINE | DT_CENTER | DT_VCENTER | (m_bShowKeyboardCues ? 0 : DT_HIDEPREFIX));
-					if(hFont != NULL)
-						dc.SelectFont(hFontOld);
-					lRet = CDRF_SKIPDEFAULT;
-					bHandled = TRUE;
-				}
-				else if(!m_bParentActive)
-				{
-					lpTBCustomDraw->clrText = ::GetSysColor(COLOR_GRAYTEXT);
-					bHandled = TRUE;
 				}
 			}
+#if _WTL_CMDBAR_VISTA_MENUS && defined(_WTL_CMDBAR_VISTA_STD_MENUBAR)
+			else if (lpTBCustomDraw->nmcd.dwDrawStage == CDDS_ITEMPOSTPAINT)
+			{
+				bool bDisabled = ((lpTBCustomDraw->nmcd.uItemState & CDIS_DISABLED) == CDIS_DISABLED);
+				if(bDisabled || !m_bParentActive)
+					lpTBCustomDraw->clrText = ::GetSysColor(COLOR_GRAYTEXT);
+
+				_ParentCustomDrawHelper(lpTBCustomDraw);
+
+				lRet = CDRF_SKIPDEFAULT;
+				bHandled = TRUE;
+			}
+#endif // _WTL_CMDBAR_VISTA_MENUS && defined(_WTL_CMDBAR_VISTA_STD_MENUBAR)
 		}
 		return lRet;
+	}
+
+	void _ParentCustomDrawHelper(LPNMTBCUSTOMDRAW lpTBCustomDraw)
+	{
+		CDCHandle dc = lpTBCustomDraw->nmcd.hdc;
+		dc.SetTextColor(lpTBCustomDraw->clrText);
+		dc.SetBkMode(lpTBCustomDraw->nStringBkMode);
+
+		HFONT hFont = GetFont();
+		HFONT hFontOld = NULL;
+		if(hFont != NULL)
+			hFontOld = dc.SelectFont(hFont);
+
+		const int cchText = 200;
+		TCHAR szText[cchText] = { 0 };
+		TBBUTTONINFO tbbi = { 0 };
+		tbbi.cbSize = sizeof(TBBUTTONINFO);
+		tbbi.dwMask = TBIF_TEXT;
+		tbbi.pszText = szText;
+		tbbi.cchText = cchText;
+		GetButtonInfo((int)lpTBCustomDraw->nmcd.dwItemSpec, &tbbi);
+
+		dc.DrawText(szText, -1, &lpTBCustomDraw->nmcd.rc, DT_SINGLELINE | DT_CENTER | DT_VCENTER | (m_bShowKeyboardCues ? 0 : DT_HIDEPREFIX));
+
+		if(hFont != NULL)
+			dc.SelectFont(hFontOld);
 	}
 
 // Message hook handlers
