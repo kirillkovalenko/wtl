@@ -68,6 +68,8 @@
 
 // Hack: Signatures in uxtheme.h changed - the only way to check which variant of uxtheme.h
 // is included is to check for presence of new defines MAX_THEMECOLOR and MAX_THEMESIZE
+// Note: In WinSDK 7.0 (and higher) they are defined with #if (_WIN32_WINNT >= 0x0600),
+// so you have to compile with _WTL_NEW_UXTHEME defined for _WIN32_WINNT < 0x0600
 #ifndef _WTL_NEW_UXTHEME
   #if defined(MAX_THEMECOLOR) && defined(MAX_THEMESIZE)
     #define _WTL_NEW_UXTHEME
