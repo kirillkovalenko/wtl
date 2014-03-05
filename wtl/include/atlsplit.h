@@ -473,7 +473,7 @@ public:
 		{
 			dc.FillRect(&rect, COLOR_3DFACE);
 
-#if !defined(_ATL_NO_MSIMG) || (_WIN32_WCE >= 420)
+#if (!defined(_WIN32_WCE) && !defined(_ATL_NO_MSIMG)) || (_WIN32_WCE >= 420)
 			if((m_dwExtendedStyle & SPLIT_GRADIENTBAR) != 0)
 			{
 				RECT rect2 = rect;
@@ -484,7 +484,7 @@ public:
 
 				dc.GradientFillRect(rect2, ::GetSysColor(COLOR_3DFACE), ::GetSysColor(COLOR_3DSHADOW), m_bVertical);
 			}
-#endif // !defined(_ATL_NO_MSIMG) || (_WIN32_WCE >= 420)
+#endif // (!defined(_WIN32_WCE) && !defined(_ATL_NO_MSIMG)) || (_WIN32_WCE >= 420)
 
 			// draw 3D edge if needed
 			T* pT = static_cast<T*>(this);
