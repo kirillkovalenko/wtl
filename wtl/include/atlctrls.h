@@ -3689,10 +3689,19 @@ public:
 		return (BOOL)::SendMessage(m_hWnd, LVM_DELETEALLITEMS, 0, 0L);
 	}
 
-	int FindItem(LVFINDINFO* pFindInfo, int nStart) const
+	int FindItem(LVFINDINFO* pFindInfo, int nStart = -1) const
 	{
 		ATLASSERT(::IsWindow(m_hWnd));
 		return (int)::SendMessage(m_hWnd, LVM_FINDITEM, nStart, (LPARAM)pFindInfo);
+	}
+
+	int FindItem(LPCTSTR lpstrFind, bool bPartial = true, bool bWrap = false, int nStart = -1) const
+	{
+		ATLASSERT(::IsWindow(m_hWnd));
+		LVFINDINFO lvfi = { 0 };
+		lvfi.flags = LVFI_STRING | (bWrap ? LVFI_WRAP : 0) | (bPartial ? LVFI_PARTIAL : 0);
+		lvfi.psz = lpstrFind;
+		return (int)::SendMessage(m_hWnd, LVM_FINDITEM, nStart, (LPARAM)&lvfi);
 	}
 
 	int HitTest(LVHITTESTINFO* pHitTestInfo) const
