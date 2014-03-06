@@ -562,7 +562,7 @@ public:
 				btn.iBitmap = 0;
 				btn.idCommand = i;
 				btn.fsState = (BYTE)(((mii.fState & MFS_DISABLED) == 0) ? TBSTATE_ENABLED : 0);
-				btn.fsStyle = TBSTYLE_BUTTON | TBSTYLE_AUTOSIZE | TBSTYLE_DROPDOWN;
+				btn.fsStyle = BTNS_BUTTON | BTNS_AUTOSIZE | BTNS_DROPDOWN;
 				btn.dwData = 0;
 				btn.iString = 0;
 

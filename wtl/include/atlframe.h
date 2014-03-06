@@ -470,7 +470,7 @@ public:
 			pTBBtn[0].iBitmap = cxSeparator / 2;
 			pTBBtn[0].idCommand = 0;
 			pTBBtn[0].fsState = 0;
-			pTBBtn[0].fsStyle = TBSTYLE_SEP;
+			pTBBtn[0].fsStyle = BTNS_SEP;
 			pTBBtn[0].dwData = 0;
 			pTBBtn[0].iString = 0;
 		}
@@ -483,7 +483,7 @@ public:
 				pTBBtn[j].iBitmap = nBmp++;
 				pTBBtn[j].idCommand = pItems[i];
 				pTBBtn[j].fsState = TBSTATE_ENABLED;
-				pTBBtn[j].fsStyle = TBSTYLE_BUTTON;
+				pTBBtn[j].fsStyle = BTNS_BUTTON;
 				pTBBtn[j].dwData = 0;
 				pTBBtn[j].iString = 0;
 			}
@@ -492,7 +492,7 @@ public:
 				pTBBtn[j].iBitmap = cxSeparator;
 				pTBBtn[j].idCommand = 0;
 				pTBBtn[j].fsState = 0;
-				pTBBtn[j].fsStyle = TBSTYLE_SEP;
+				pTBBtn[j].fsStyle = BTNS_SEP;
 				pTBBtn[j].dwData = 0;
 				pTBBtn[j].iString = 0;
 			}
@@ -3058,10 +3058,6 @@ public:
 	}
 
 // ToolBar
-#ifndef BTNS_SEP
-  #define BTNS_SEP TBSTYLE_SEP
-#endif // BTNS_SEP compatibility
-
 #if !defined(_WIN32_WCE) || (defined(_AUTOUI_CE_TOOLBAR) && defined(TBIF_BYINDEX))
 	bool UIAddToolBar(HWND hWndToolBar)
 	{

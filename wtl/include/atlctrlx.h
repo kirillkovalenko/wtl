@@ -2689,7 +2689,7 @@ public:
 			TBBUTTON tbbtn = { 0 };
 			tbbtn.idCommand = pT->m_nCloseBtnID;
 			tbbtn.fsState = TBSTATE_ENABLED;
-			tbbtn.fsStyle = TBSTYLE_BUTTON;
+			tbbtn.fsStyle = BTNS_BUTTON;
 			m_tb.AddButtons(1, &tbbtn);
 
 			m_tb.SetBitmapSize(m_cxImageTB, m_cyImageTB);

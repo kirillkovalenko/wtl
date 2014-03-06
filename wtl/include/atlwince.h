@@ -2632,7 +2632,7 @@ public:
 	BOOL SetItemState(int iIndex, UINT uState, UINT uMask)
 	{
 		ATLASSERT(::IsWindow(m_hWnd));
-		LV_ITEM lvi = { 0 };
+		LVITEM lvi = { 0 };
 		lvi.stateMask = uMask;
 		lvi.state = uState;
 		return (BOOL)::SendMessage(m_hWnd, DLM_SETITEMSTATE, (WPARAM)iIndex, (LPARAM)&lvi);

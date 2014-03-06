@@ -414,6 +414,46 @@ static CWndClassInfo& GetWndClassInfo() \
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Global support for old SDK headers
+
+#ifndef BTNS_BUTTON
+  #define BTNS_BUTTON	TBSTYLE_BUTTON
+#endif
+
+#ifndef BTNS_SEP
+  #define BTNS_SEP	TBSTYLE_SEP
+#endif
+
+#ifndef BTNS_CHECK
+  #define BTNS_CHECK	TBSTYLE_CHECK
+#endif
+
+#ifndef BTNS_GROUP
+  #define BTNS_GROUP	TBSTYLE_GROUP
+#endif
+
+#ifndef BTNS_CHECKGROUP
+  #define BTNS_CHECKGROUP	TBSTYLE_CHECKGROUP
+#endif
+
+#if (_WIN32_IE >= 0x0300)
+  #ifndef BTNS_DROPDOWN
+    #define BTNS_DROPDOWN	TBSTYLE_DROPDOWN
+  #endif
+#endif
+
+#if (_WIN32_IE >= 0x0400)
+  #ifndef BTNS_AUTOSIZE
+    #define BTNS_AUTOSIZE	TBSTYLE_AUTOSIZE
+  #endif
+
+  #ifndef BTNS_NOPREFIX
+    #define BTNS_NOPREFIX	TBSTYLE_NOPREFIX
+  #endif
+#endif
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Global support for SecureHelper functions
 
 #ifndef _TRUNCATE
