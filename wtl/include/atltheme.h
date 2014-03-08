@@ -500,17 +500,17 @@ inline bool AtlDrawThemeClientEdge(HTHEME hTheme, HWND hWnd, HRGN hRgnUpdate = N
 		return false;
 
 	// Get border size
-	int cxBorder = GetSystemMetrics(SM_CXBORDER);
-	int cyBorder = GetSystemMetrics(SM_CYBORDER);
+	int cxBorder = ::GetSystemMetrics(SM_CXBORDER);
+	int cyBorder = ::GetSystemMetrics(SM_CYBORDER);
 	if(SUCCEEDED(::GetThemeInt(hTheme, nPartID, nStateID, TMT_SIZINGBORDERWIDTH, &cxBorder)))
 		cyBorder = cxBorder;
 
-	RECT rect;
+	RECT rect = { 0 };
 	::GetWindowRect(hWnd, &rect);            
 
 	// Remove the client edge from the update region
-	int cxEdge = GetSystemMetrics(SM_CXEDGE);
-	int cyEdge = GetSystemMetrics(SM_CYEDGE);
+	int cxEdge = ::GetSystemMetrics(SM_CXEDGE);
+	int cyEdge = ::GetSystemMetrics(SM_CYEDGE);
 	::InflateRect(&rect, -cxEdge, -cyEdge);
 	CRgn rgn;
 	rgn.CreateRectRgnIndirect(&rect);
@@ -615,6 +615,7 @@ public:
 			m_dwExtendedStyle = dwExtendedStyle;
 		else
 			m_dwExtendedStyle = (m_dwExtendedStyle & ~dwMask) | (dwExtendedStyle & dwMask);
+
 		return dwPrevStyle;
 	}
 
@@ -632,6 +633,7 @@ public:
 		if(m_lpstrThemeClassList == NULL)
 			return NULL;
 		CloseThemeData();
+
 		return TBase::OpenThemeData(pT->m_hWnd, m_lpstrThemeClassList);
 	}
 
@@ -639,6 +641,7 @@ public:
 	{
 		if(!SetThemeClassList(pszClassList))
 			return NULL;
+
 		return OpenThemeData();
 	}
 
@@ -743,6 +746,7 @@ public:
 	{
 		if(m_lpstrThemeClassList != NULL)
 			OpenThemeData();
+
 		bHandled = FALSE;
 		return 1;
 	}
@@ -750,6 +754,7 @@ public:
 	LRESULT OnDestroy(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& bHandled)
 	{
 		CloseThemeData();
+
 		bHandled = FALSE;
 		return 1;
 	}
@@ -759,6 +764,7 @@ public:
 		CloseThemeData();
 		if(m_lpstrThemeClassList != NULL)
 			OpenThemeData();
+
 		bHandled = FALSE;
 		return 1;
 	}
@@ -783,6 +789,7 @@ public:
 					bHandled = TRUE;
 			}
 		}
+
 		return lRet;
 	}
 
