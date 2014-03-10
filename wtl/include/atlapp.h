@@ -304,6 +304,22 @@ static CWndClassInfo& GetWndClassInfo() \
 ///////////////////////////////////////////////////////////////////////////////
 // Global support for using original VC++ 6.0 headers with WTL
 
+#if (_MSC_VER < 1300) && !defined(_WIN32_WCE)
+  #ifndef REG_QWORD
+    #define REG_QWORD	11
+  #endif
+
+  #ifndef BS_PUSHBOX
+    #define BS_PUSHBOX	0x0000000AL
+  #endif
+
+  struct __declspec(uuid("000214e6-0000-0000-c000-000000000046")) IShellFolder;
+  struct __declspec(uuid("000214f9-0000-0000-c000-000000000046")) IShellLinkW;
+  struct __declspec(uuid("000214ee-0000-0000-c000-000000000046")) IShellLinkA;
+
+  #pragma warning(disable: 4201)   // nameless struct/union
+#endif // (_MSC_VER < 1300) && !defined(_WIN32_WCE)
+
 #ifndef _ATL_NO_OLD_HEADERS_WIN64
 #if !defined(_WIN64) && (_ATL_VER < 0x0700)
 
@@ -411,6 +427,20 @@ static CWndClassInfo& GetWndClassInfo() \
 
 #endif // !defined(_WIN64) && (_ATL_VER < 0x0700)
 #endif // !_ATL_NO_OLD_HEADERS_WIN64
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Global support for using original VC++ 7.x headers with WTL
+
+#if (_MSC_VER >= 1300) && (_MSC_VER < 1400)
+
+  #ifndef BS_PUSHBOX
+    #define BS_PUSHBOX	0x0000000AL
+  #endif
+
+  #pragma warning(disable: 4244)   // conversion from 'type1' to 'type2', possible loss of data
+
+#endif // (_MSC_VER >= 1300) && (_MSC_VER < 1400)
 
 
 ///////////////////////////////////////////////////////////////////////////////
