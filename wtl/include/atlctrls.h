@@ -8107,6 +8107,116 @@ public:
 		return (BOOL)::SendMessage(m_hWnd, EM_SETTABSTOPS, 1, (LPARAM)(LPINT)&cxEachStop);
 	}
 #endif // (_RICHEDIT_VER >= 0x0300)
+
+#if (_RICHEDIT_VER >= 0x0800)
+	AutoCorrectProc GetAutoCorrectProc() const
+	{
+		ATLASSERT(::IsWindow(m_hWnd));
+		return (AutoCorrectProc)::SendMessage(m_hWnd, EM_GETAUTOCORRECTPROC, 0, 0L);
+	}
+
+	BOOL SetAutoCorrectProc(AutoCorrectProc pfn)
+	{
+		ATLASSERT(::IsWindow(m_hWnd));
+		return (BOOL)::SendMessage(m_hWnd, EM_SETAUTOCORRECTPROC, (WPARAM)pfn, 0L);
+	}
+
+	BOOL CallAutoCorrectProc(WCHAR ch)
+	{
+		ATLASSERT(::IsWindow(m_hWnd));
+		return (BOOL)::SendMessage(m_hWnd, EM_CALLAUTOCORRECTPROC, (WPARAM)ch, 0L);
+	}
+
+	DWORD GetEditStyleEx() const
+	{
+		ATLASSERT(::IsWindow(m_hWnd));
+		return (DWORD)::SendMessage(m_hWnd, EM_GETEDITSTYLEEX, 0, 0L);
+	}
+
+	DWORD SetEditStyleEx(DWORD dwStyleEx, DWORD dwMask)
+	{
+		ATLASSERT(::IsWindow(m_hWnd));
+		return (DWORD)::SendMessage(m_hWnd, EM_SETEDITSTYLEEX, dwStyleEx, dwMask);
+	}
+
+	DWORD GetStoryType(int nStoryIndex) const
+	{
+		ATLASSERT(::IsWindow(m_hWnd));
+		return (DWORD)::SendMessage(m_hWnd, EM_GETSTORYTYPE, nStoryIndex, 0L);
+	}
+
+	DWORD SetStoryType(int nStoryIndex, DWORD dwStoryType)
+	{
+		ATLASSERT(::IsWindow(m_hWnd));
+		return (DWORD)::SendMessage(m_hWnd, EM_SETSTORYTYPE, nStoryIndex, dwStoryType);
+	}
+
+	DWORD GetEllipsisMode() const
+	{
+		ATLASSERT(::IsWindow(m_hWnd));
+
+		DWORD dwMode = 0;
+		BOOL bRet = (BOOL)::SendMessage(m_hWnd, EM_GETELLIPSISMODE, 0, (LPARAM)&dwMode);
+		bRet;   // avoid level 4 warning
+		ATLASSERT(bRet != FALSE);
+
+		return dwMode;
+	}
+
+	BOOL SetEllipsisMode(DWORD dwEllipsisMode)
+	{
+		ATLASSERT(::IsWindow(m_hWnd));
+		return (BOOL)::SendMessage(m_hWnd, EM_SETELLIPSISMODE, 0, dwEllipsisMode);
+	}
+
+	BOOL GetEllipsisState() const
+	{
+		ATLASSERT(::IsWindow(m_hWnd));
+		return (BOOL)::SendMessage(m_hWnd, EM_GETELLIPSISSTATE, 0, 0L);
+	}
+
+	BOOL GetTouchOptions(int nTouchOptions) const
+	{
+		ATLASSERT(::IsWindow(m_hWnd));
+		return (BOOL)::SendMessage(m_hWnd, EM_GETTOUCHOPTIONS, nTouchOptions, 0L);
+	}
+
+	void SetTouchOptions(int nTouchOptions, BOOL bEnable)
+	{
+		ATLASSERT(::IsWindow(m_hWnd));
+		::SendMessage(m_hWnd, EM_SETTOUCHOPTIONS, nTouchOptions, bEnable);
+	}
+
+	HRESULT InsertTable(TABLEROWPARMS* pRowParams, TABLECELLPARMS* pCellParams)
+	{
+		ATLASSERT(::IsWindow(m_hWnd));
+		return (HRESULT)::SendMessage(m_hWnd, EM_INSERTTABLE, (WPARAM)pRowParams, (LPARAM)pCellParams);
+	}
+
+	HRESULT GetTableParams(TABLEROWPARMS* pRowParams, TABLECELLPARMS* pCellParams) const
+	{
+		ATLASSERT(::IsWindow(m_hWnd));
+		return (HRESULT)::SendMessage(m_hWnd, EM_GETTABLEPARMS, (WPARAM)pRowParams, (LPARAM)pCellParams);
+	}
+
+	HRESULT SetTableParams(TABLEROWPARMS* pRowParams, TABLECELLPARMS* pCellParams)
+	{
+		ATLASSERT(::IsWindow(m_hWnd));
+		return (HRESULT)::SendMessage(m_hWnd, EM_SETTABLEPARMS, (WPARAM)pRowParams, (LPARAM)pCellParams);
+	}
+
+	HRESULT InsertImage(RICHEDIT_IMAGE_PARAMETERS* pParams)
+	{
+		ATLASSERT(::IsWindow(m_hWnd));
+		return (HRESULT)::SendMessage(m_hWnd, EM_INSERTIMAGE, 0, (LPARAM)pParams);
+	}
+
+	BOOL SetUiaName(LPCTSTR lpstrName)
+	{
+		ATLASSERT(::IsWindow(m_hWnd));
+		return (BOOL)::SendMessage(m_hWnd, EM_SETUIANAME, 0, (LPARAM)lpstrName);
+	}
+#endif // (_RICHEDIT_VER >= 0x0800)
 };
 
 typedef CRichEditCtrlT<ATL::CWindow>   CRichEditCtrl;
