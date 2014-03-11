@@ -5807,6 +5807,14 @@ public:
 		ATLASSERT(::IsWindow(m_hWnd));
 		return CImageList((HIMAGELIST)::SendMessage(m_hWnd, TB_SETPRESSEDIMAGELIST, nIndex, (LPARAM)hImageList));
 	}
+
+	void GetItemDropDownRect(int nIndex, LPRECT lpRect) const
+	{
+		ATLASSERT(::IsWindow(m_hWnd));
+		BOOL bRet = (BOOL)::SendMessage(m_hWnd, TB_GETITEMDROPDOWNRECT, nIndex, (LPARAM)lpRect);
+		bRet;   // avoid level 4 warning
+		ATLASSERT(bRet != FALSE);
+	}
 #endif // (_WIN32_WINNT >= 0x0600)
 
 // Operations
