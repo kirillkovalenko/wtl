@@ -58,7 +58,7 @@
   #pragma comment(lib, "comctl32.lib")
 #endif
 
-#if defined(_SYSINFOAPI_H_) && defined(NOT_BUILD_WINDOWS_DEPRECATE)
+#if defined(_SYSINFOAPI_H_) && defined(NOT_BUILD_WINDOWS_DEPRECATE) && (_WIN32_WINNT >= 0x0501)
   #include <VersionHelpers.h>
 #endif
 
