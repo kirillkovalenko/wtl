@@ -5810,6 +5810,9 @@ public:
 
 	void GetItemDropDownRect(int nIndex, LPRECT lpRect) const
 	{
+#ifndef TB_GETITEMDROPDOWNRECT
+		const int TB_GETITEMDROPDOWNRECT = WM_USER + 103;
+#endif
 		ATLASSERT(::IsWindow(m_hWnd));
 		BOOL bRet = (BOOL)::SendMessage(m_hWnd, TB_GETITEMDROPDOWNRECT, nIndex, (LPARAM)lpRect);
 		bRet;   // avoid level 4 warning
