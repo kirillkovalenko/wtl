@@ -430,6 +430,7 @@ public:
 
 		RECT rect = { 0 };
 		::GetWindowRect(hWnd, &rect);
+		::OffsetRect(&rect, m_ptOffset.x, m_ptOffset.y);
 		::MapWindowPoints(NULL, pT->m_hWnd, (LPPOINT)&rect, 2);
 		ScrollToView(rect);
 	}
