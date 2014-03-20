@@ -2103,11 +2103,17 @@ public:
 			ATLASSERT(pT != NULL);
 			ATLASSERT(::IsWindow(pT->m_hWnd));
 		}
+		else
+		{
+			ATLASSERT(FALSE);
+			return 0;
+		}
 
 		// pass to the message map
-		LRESULT lRes;
+		LRESULT lRes = 0;
 		if(pT->ProcessWindowMessage(pT->m_hWnd, uMsg, wParam, lParam, lRes, 0) == FALSE)
 			return 0;
+
 		return lRes;
 	}
 
@@ -6317,7 +6323,7 @@ public:
 			break;
 		}
 
-		return (HRESULT)bRet;
+		return (bRet != FALSE) ? S_OK : S_FALSE;
 	}
 
 // Overrideables - notification handlers

@@ -1525,11 +1525,11 @@ public:
 		if(pThis->m_dwState & WINSTATE_DESTROYED && pThis->m_pCurrentMsg == NULL)
 		{
 			// clear out window handle
-			HWND hWnd = pThis->m_hWnd;
+			HWND hWndThis = pThis->m_hWnd;
 			pThis->m_hWnd = NULL;
 			pThis->m_dwState &= ~WINSTATE_DESTROYED;
 			// clean up after window is destroyed
-			pThis->OnFinalMessage(hWnd);
+			pThis->OnFinalMessage(hWndThis);
 		}
 #endif // (_ATL_VER >= 0x0700)
 		return lRes;
@@ -2789,8 +2789,8 @@ public:
 		const _AtlUpdateUIMap* pMap = pT->GetUpdateUIMap();
 		m_pUIMap = pMap;
 		ATLASSERT(m_pUIMap != NULL);
-		int nCount;
-		for(nCount = 1; pMap->m_nID != (WORD)-1; nCount++)
+		int nCount = 1;
+		for( ; pMap->m_nID != (WORD)-1; nCount++)
 			pMap++;
 
 		// check for duplicates (debug only)
