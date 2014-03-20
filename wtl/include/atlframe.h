@@ -1021,7 +1021,7 @@ public:
 			bRet = (BOOL)wnd.SendMessage(TB_GETITEMRECT, i, (LPARAM)&rcButton);
 			ATLASSERT(bRet);
 			bool bEnabled = ((tbb.fsState & TBSTATE_ENABLED) != 0);
-			if(rcButton.right > rcClient.right)
+			if((rcButton.right > rcClient.right) || (rcButton.bottom > rcClient.bottom))
 			{
 				if(tbb.fsStyle & BTNS_SEP)
 				{
