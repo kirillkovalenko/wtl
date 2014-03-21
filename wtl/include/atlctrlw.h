@@ -911,6 +911,7 @@ public:
 		MESSAGE_HANDLER(GetGetBarMessage(), OnInternalGetBar)
 		MESSAGE_HANDLER(WM_SETTINGCHANGE, OnSettingChange)
 		MESSAGE_HANDLER(WM_MENUCHAR, OnMenuChar)
+		MESSAGE_HANDLER(WM_KILLFOCUS, OnKillFocus)
 
 		MESSAGE_HANDLER(WM_KEYDOWN, OnKeyDown)
 		MESSAGE_HANDLER(WM_KEYUP, OnKeyUp)
@@ -1573,6 +1574,15 @@ public:
 		}
 
 		return lRet;
+	}
+
+	LRESULT OnKillFocus(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& bHandled)
+	{
+		if(m_bUseKeyboardCues && m_bShowKeyboardCues)
+			ShowKeyboardCues(false);
+
+		bHandled = FALSE;
+		return 1;
 	}
 
 	LRESULT OnDrawItem(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM lParam, BOOL& bHandled)
