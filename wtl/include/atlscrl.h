@@ -1274,6 +1274,17 @@ class CZoomScrollImpl : public CScrollImpl< T >
 public:
 	enum { m_cxyMinZoomRect = 12 };   // min rect size to zoom in on rect.
 
+	struct _ChildPlacement
+	{
+		HWND hWnd;
+		int x;
+		int y;
+		int cx;
+		int cy;
+
+		bool operator ==(const _ChildPlacement& cp) const { return (memcmp(this, &cp, sizeof(_ChildPlacement)) == 0); }
+	};
+
 // Data members
 	SIZE m_sizeLogAll;		
 	SIZE m_sizeLogLine;	
@@ -1285,13 +1296,12 @@ public:
 	RECT m_rcTrack;
 	bool m_bTracking;
 
+	bool m_bZoomChildren;
+	ATL::CSimpleArray<_ChildPlacement> m_arrChildren;
+
 // Constructor
-	CZoomScrollImpl():
-			m_fZoomScale(1.0),
-			m_fZoomScaleMin(0.5),
-			m_fZoomDelta(0.5),
-			m_nZoomMode(ZOOMMODE_OFF),
-			m_bTracking(false)
+	CZoomScrollImpl(): m_fZoomScale(1.0), m_fZoomScaleMin(0.5), m_fZoomDelta(0.5), 
+	                   m_nZoomMode(ZOOMMODE_OFF), m_bTracking(false), m_bZoomChildren(false)
 	{
 		m_sizeLogAll.cx = 0;
 		m_sizeLogAll.cy = 0;
@@ -1303,14 +1313,13 @@ public:
 	}
 
 // Attributes & Operations
-
 	// size operations
 	void SetScrollSize(int cxLog, int cyLog, BOOL bRedraw = TRUE, bool bResetOffset = true)
 	{
 		ATLASSERT(cxLog >= 0 && cyLog >= 0);
 
 		// Set up the defaults
-		if (cxLog == 0 && cyLog == 0)
+		if((cxLog == 0) && (cyLog == 0))
 		{
 			cxLog = 1;
 			cyLog = 1;
@@ -1362,7 +1371,7 @@ public:
 	// page operations
 	void SetScrollPage(int cxLogPage, int cyLogPage)
 	{
-		ATLASSERT(cxLogPage >= 0 && cyLogPage >= 0);
+		ATLASSERT((cxLogPage >= 0) && (cyLogPage >= 0));
 
 		m_sizeLogPage.cx = cxLogPage;
 		m_sizeLogPage.cy = cyLogPage;
@@ -1388,7 +1397,7 @@ public:
 	{
 		ATLASSERT(fZoomScale > 0);
 
-		if(fZoomScale > 0 && fZoomScale >= m_fZoomScaleMin)
+		if((fZoomScale > 0) && (fZoomScale >= m_fZoomScaleMin))
 			m_fZoomScale = fZoomScale;
 	}
 
@@ -1430,6 +1439,38 @@ public:
 		return m_nZoomMode;
 	}
 
+	void SetZoomChildren(bool bEnable = true)
+	{
+		T* pT = static_cast<T*>(this);
+		ATLASSERT(::IsWindow(pT->m_hWnd));
+
+		m_bZoomChildren = bEnable;
+
+		m_arrChildren.RemoveAll();
+		if(m_bZoomChildren)
+		{
+			for(HWND hWndChild = ::GetWindow(pT->m_hWnd, GW_CHILD); hWndChild != NULL; hWndChild = ::GetWindow(hWndChild, GW_HWNDNEXT))
+			{
+				RECT rect = { 0 };
+				::GetWindowRect(hWndChild, &rect);
+				::MapWindowPoints(NULL, pT->m_hWnd, (LPPOINT)&rect, 2);
+
+				_ChildPlacement cp = { 0 };
+				cp.hWnd = hWndChild;
+				cp.x = rect.left;
+				cp.y = rect.top;
+				cp.cx = rect.right - rect.left;
+				cp.cy = rect.bottom - rect.top;
+				m_arrChildren.Add(cp);
+			}
+		}
+	}
+
+	bool GetZoomChildren() const
+	{
+		return m_bZoomChildren;
+	}
+
 	void Zoom(int x, int y, float fZoomScale)
 	{
 		if(fZoomScale <= 0)
@@ -1466,7 +1507,7 @@ public:
 			return;
 		}
 
-		ATLASSERT(size.cx > 0 && size.cy > 0);
+		ATLASSERT((size.cx > 0) && (size.cy > 0));
 		
 		float fScaleH = (float)(m_sizeClient.cx  + 1) / (float)size.cx;
 		float fScaleV = (float)(m_sizeClient.cy + 1) / (float)size.cy;
@@ -1481,26 +1522,43 @@ public:
 
 		fZoomScale = __max(fZoomScale, m_fZoomScaleMin);
 
-
 		T* pT = static_cast<T*>(this);
 		POINT pt = { 0 };
 		if(bCenter)
 		{
-			RECT rc;
-			::GetClientRect(pT->m_hWnd, &rc);
-			pt.x = rc.right / 2;
-			pt.y = rc.bottom / 2;
+			RECT rcClient = { 0 };
+			::GetClientRect(pT->m_hWnd, &rcClient);
+			pt.x = rcClient.right / 2;
+			pt.y = rcClient.bottom / 2;
 			pT->ViewDPtoLP(&pt);
 		}
 
 		// Modify the Viewport extent
-		m_fZoomScale = fZoomScale;
 		SIZE sizeAll = { 0 };
 		sizeAll.cx = (int)((float)m_sizeLogAll.cx * fZoomScale);
 		sizeAll.cy = (int)((float)m_sizeLogAll.cy * fZoomScale);
 		
 		// Update scroll bars and window
 		CScrollImpl< T >::SetScrollSize(sizeAll);
+
+		// Zoom all children if needed
+		if(m_bZoomChildren && (m_fZoomScale != fZoomScale))
+		{
+			for(int i = 0; i < m_arrChildren.GetSize(); i++)
+			{
+				ATLASSERT(::IsWindow(m_arrChildren[i].hWnd));
+
+				::SetWindowPos(m_arrChildren[i].hWnd, NULL, 
+					(int)((float)m_arrChildren[i].x * fZoomScale + 0.5f), 
+					(int)((float)m_arrChildren[i].y * fZoomScale + 0.5f), 
+					(int)((float)m_arrChildren[i].cx * fZoomScale + 0.5f), 
+					(int)((float)m_arrChildren[i].cy * fZoomScale + 0.5f), 
+					SWP_NOZORDER | SWP_NOACTIVATE);
+			}
+		}
+
+		// Set new zoom scale
+		m_fZoomScale = fZoomScale;
 
 		if(bCenter)
 			pT->CenterOnLogicalPoint(pt);
@@ -1553,7 +1611,7 @@ public:
 	void CenterOnPoint(POINT pt)
 	{
 		T* pT = static_cast<T*>(this);
-		RECT rect;
+		RECT rect = { 0 };
 		pT->GetClientRect(&rect);
 
 		int xOfs = pt.x - (rect.right / 2) + m_ptOffset.x;
@@ -1606,6 +1664,7 @@ public:
 			rc.right = rc.left;
 			rc.left = r;
 		}
+
 		if(rc.top > rc.bottom)
 		{
 			int b = rc.bottom;
@@ -1672,8 +1731,8 @@ public:
 	{
 		T* pT = static_cast<T*>(this);
 		ATLASSERT(::IsWindow(pT->m_hWnd));
-		ATLASSERT(m_sizeLogAll.cx >= 0 && m_sizeLogAll.cy >= 0);
-		ATLASSERT(m_sizeAll.cx >= 0 && m_sizeAll.cy >= 0);
+		ATLASSERT((m_sizeLogAll.cx >= 0) && (m_sizeLogAll.cy >= 0));
+		ATLASSERT((m_sizeAll.cx >= 0) && (m_sizeAll.cy >= 0));
 
 		if(wParam != NULL)
 		{
@@ -1700,6 +1759,7 @@ public:
 			pT->PrepareDC(dc.m_hDC);
 			pT->DoPaint(dc.m_hDC);
 		}
+
 		return 0;
 	}
 
@@ -1716,6 +1776,7 @@ public:
 				::SetRect(&m_rcTrack, pt.x, pt.y, pt.x, pt.y);
 			}	
 		}
+
 		bHandled = FALSE;
 		return 0;
 	}
@@ -1734,6 +1795,7 @@ public:
 				pT->DrawTrackRect();
 			}
 		}
+
 		bHandled = FALSE;
 		return 0;
 	}
@@ -1747,6 +1809,7 @@ public:
 			pT->Zoom(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), m_fZoomScale - m_fZoomDelta);
 			pT->NotifyParentZoomChanged();
 		}
+
 		bHandled = FALSE;
 		return 0;
 	}
@@ -1762,6 +1825,7 @@ public:
 			pT->NotifyParentZoomChanged();
 			::SetRectEmpty(&m_rcTrack);
 		}
+
 		bHandled = FALSE;
 		return 0;
 	}	
@@ -1783,6 +1847,7 @@ public:
 				}
 			}
 		}
+
 		bHandled = FALSE;
 		return 0;
 	}
