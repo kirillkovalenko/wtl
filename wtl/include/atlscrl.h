@@ -1291,6 +1291,7 @@ public:
 	SIZE m_sizeLogPage;
 	float m_fZoomScale;
 	float m_fZoomScaleMin;
+	float m_fZoomScaleMax;
 	float m_fZoomDelta;   // Used in ZOOMMODE_IN and ZOOMMODE_OUT on left-button click.
 	int m_nZoomMode;		
 	RECT m_rcTrack;
@@ -1300,7 +1301,7 @@ public:
 	ATL::CSimpleArray<_ChildPlacement> m_arrChildren;
 
 // Constructor
-	CZoomScrollImpl(): m_fZoomScale(1.0), m_fZoomScaleMin(0.5), m_fZoomDelta(0.5), 
+	CZoomScrollImpl(): m_fZoomScale(1.0f), m_fZoomScaleMin(0.1f), m_fZoomScaleMax(100.0f), m_fZoomDelta(0.5f), 
 	                   m_nZoomMode(ZOOMMODE_OFF), m_bTracking(false), m_bZoomChildren(false)
 	{
 		m_sizeLogAll.cx = 0;
@@ -1395,10 +1396,15 @@ public:
 
 	void SetZoomScale(float fZoomScale)
 	{
-		ATLASSERT(fZoomScale > 0);
+		ATLASSERT(fZoomScale > 0.0f);
+		if(fZoomScale <= 0.0f)
+			return;
 
-		if((fZoomScale > 0) && (fZoomScale >= m_fZoomScaleMin))
-			m_fZoomScale = fZoomScale;
+		m_fZoomScale = fZoomScale;
+		if(m_fZoomScale < m_fZoomScaleMin)
+			m_fZoomScale = m_fZoomScaleMin;
+		else if(m_fZoomScale > m_fZoomScaleMax)
+			m_fZoomScale = m_fZoomScaleMax;
 	}
 
 	float GetZoomScale() const
@@ -1408,6 +1414,9 @@ public:
 
 	void SetZoomScaleMin(float fZoomScaleMin)
 	{
+		ATLASSERT(fZoomScaleMin > 0.0f);
+		ATLASSERT(fZoomScaleMin <= m_fZoomScaleMax);
+
 		m_fZoomScaleMin = fZoomScaleMin;
 	}
 
@@ -1416,11 +1425,24 @@ public:
 		return m_fZoomScaleMin;
 	}
 
+	void SetZoomScaleMax(float fZoomScaleMax)
+	{
+		ATLASSERT(fZoomScaleMax > 0.0f);
+		ATLASSERT(m_fZoomScaleMin <= fZoomScaleMax);
+
+		m_fZoomScaleMax = fZoomScaleMax;
+	}
+
+	float GetZoomScaleMax() const
+	{
+		return m_fZoomScaleMax;
+	}
+
 	void SetZoomDelta(float fZoomDelta)
 	{
-		ATLASSERT(fZoomDelta >= 0);
+		ATLASSERT(fZoomDelta >= 0.0f);
 
-		if(fZoomDelta >= 0)
+		if(fZoomDelta >= 0.0f)
 			m_fZoomDelta = fZoomDelta;
 	}
 
@@ -1473,10 +1495,13 @@ public:
 
 	void Zoom(int x, int y, float fZoomScale)
 	{
-		if(fZoomScale <= 0)
+		if(fZoomScale <= 0.0f)
 			return;
 
-		fZoomScale = __max(fZoomScale, m_fZoomScaleMin);
+		if(fZoomScale < m_fZoomScaleMin)
+			fZoomScale = m_fZoomScaleMin;
+		else if(fZoomScale > m_fZoomScaleMax)
+			fZoomScale = m_fZoomScaleMax;
 
 		T* pT = static_cast<T*>(this);
 		POINT pt = { x, y };
@@ -1517,10 +1542,13 @@ public:
 
 	void Zoom(float fZoomScale, bool bCenter = true)
 	{
-		if(fZoomScale <= 0)
+		if(fZoomScale <= 0.0f)
 			return;
 
-		fZoomScale = __max(fZoomScale, m_fZoomScaleMin);
+		if(fZoomScale < m_fZoomScaleMin)
+			fZoomScale = m_fZoomScaleMin;
+		else if(fZoomScale > m_fZoomScaleMax)
+			fZoomScale = m_fZoomScaleMax;
 
 		T* pT = static_cast<T*>(this);
 		POINT pt = { 0 };
