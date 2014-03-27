@@ -1781,6 +1781,15 @@ old AppWizards for VC++ 6.0 and eVC++ 4.0/3.0 are not included in this version
 of WTL because they cannot be a part of an Open Source project. They are still 
 available in the previous release, WTL 7.1.</font></p>
 <p style=margin:0in>&nbsp;</p>
+<p style=margin:0in><font face="Arial" size="2"><b>~</b>&nbsp;&nbsp;&nbsp; Visual 
+Studio 2012 and higher use default subsystem version 6.0 (Windows Vista). Previous 
+versions of Visual Studio used 5.01 (Windows XP). That means that applications built 
+with Visual Studio 2012 and higher cannot run on Windows XP. Attempting to run would 
+result in an error that it is not a valid Win32 application. If you want to run your 
+applications on Windows XP, you need to change subsystem version to 5.01. You can do 
+that by going to Project Properties -> Linker -> System -> Minimum Required Version, 
+and entering 5.01 as a value.</font></p>
+<p style=margin:0in>&nbsp;</p>
 <p style=margin:0in>&nbsp;</p>
 <p style=margin:0in><b><font face="Arial">
 <a name="Changes Between WTL 9.0 And 8.0"></a>Changes Between WTL 9.0 And 8.0</font></b></p>
