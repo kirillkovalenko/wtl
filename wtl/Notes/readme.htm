@@ -1673,21 +1673,37 @@ services that are appropriate and supported for each Windows CE platform.</font>
 <a name="Support for Visual C++ Express"></a>Support for 
 Visual C++ Express</font></b></p>
 <p style=margin:0in>&nbsp;</p>
-<p style=margin:0in><font face="Arial" size="2">WTL supports using Visual 
-C++ Express Edition (2005/2008/2010) to build projects. Since Visual C++ Express ships without ATL, you have 
-to use a version of ATL that ships with the Platform SDK.</font></p>
+<p style=margin:0in><font face="Arial" size="2">WTL supports using Visual C++ Express Edition to build projects. Since Visual C++ Express ships without ATL, you have to use a version of ATL that ships with Windows Driver Kit 7.1.0 or Platform SDK (Windows Server 2003 R2 Platform SDK).</font></p>
 <p style=margin:0in>&nbsp;</p>
-<p style=margin:0in><font face="Arial" size="2">The WTL App Wizard can be 
-installed by running AppWiz\setup.js program. The App Wizard generates code 
-in the stdafx.h file that allows use of ATL3 from the Platform SDK. That code is 
-used if _WTL_SUPPORT_EXTERNAL_ATL is defined, so you can comment the line in stdafx.h 
-that defines _WTL_SUPPORT_EXTERNAL_ATL to use the project with different versions of 
-Visual C++ or ATL.</font></p>
+<p style=margin:0in><font face="Arial" size="2">Windows Driver Kit 7.1.0 contains ATL version 8, while Platform SDK has ATL version 3. We recomend ATL from Windows Driver Kit since it is newer and better version. However, you can still use ATL from Platform SDK since WTL still fully supports ATL3.</font></p>
 <p style=margin:0in>&nbsp;</p>
-<p style=margin:0in><font face="Arial" size="2">Note that Release builds will 
-generate some warnings, since ATL3 from Platform SDK is an old version of ATL 
-which doesn't quite match the newer compiler and CRT files. You can ignore those 
-warnings, as they do not indicate any real problems with the code.</font></p>
+<p style=margin:0in><font face="Arial" size="2">The WTL App Wizard can be installed by running AppWiz\setup.js program. The App Wizard generates code in the stdafx.h file that allows use of ATL. That code is used if _WTL_SUPPORT_EXTERNAL_ATL is defined, so you can comment the line in stdafx.h that defines _WTL_SUPPORT_EXTERNAL_ATL to use the project with different versions of Visual C++ or ATL.</font></p>
+<p style=margin:0in>&nbsp;</p>
+<p style=margin:0in><font face="Arial" size="2">Note that Release builds might generate some warnings, since ATL3 from Platform SDK is an old version of ATL which doesn't quite match the newer compiler and CRT files. You can ignore those warnings, as they do not indicate any real problems with the code.</font></p>
+<p style=margin:0in>&nbsp;</p>
+<p style=margin:0in><font face="Arial" size="2">Supported VC++ versions:</font></p>
+<ul style='margin-top:0in;margin-bottom:0in'>
+  <li><font face="Arial" size="2">VC++ 2005 Express</font></li>
+  <li><font face="Arial" size="2">VC++ 2008 Express</font></li>
+  <li><font face="Arial" size="2">VC++ 2010 Express</font></li>
+  <li><font face="Arial" size="2">VC++ Express 2012 for Windows Desktop</font></li>
+  <li><font face="Arial" size="2">VC++ Express 2013 for Windows Desktop</font></li>
+</ul>
+<p style=margin:0in>&nbsp;</p>
+<p style=margin:0in><font face="Arial" size="2">Supported ATL versions:</font></p>
+<ul style='margin-top:0in;margin-bottom:0in'>
+  <li><font face="Arial" size="2">from Platform SDK (ATL 3)</font></li>
+  <li><font face="Arial" size="2">from Windows Driver Kit (ATL 8)</font></li>
+</ul>
+<p style=margin:0in>&nbsp;</p>
+<p style=margin:0in><font face="Arial" size="2">Download Links:</font></p>
+<p style=margin:0in><font face="Arial" size="2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a target="_blank" href="http://www.microsoft.com/en-us/download/details.aspx?id=40787">Visual Studio Express 2013 for Windows Desktop</a></font></p>
+<p style=margin:0in><font face="Arial" size="2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a target="_blank" href="http://www.microsoft.com/en-us/download/details.aspx?id=34673">Visual Studio Express 2012 for Windows Desktop</a></font></p>
+<p style=margin:0in><font face="Arial" size="2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a target="_blank" href="http://www.visualstudio.com/downloads/download-visual-studio-vs#DownloadFamilies_4">Visual Studio 2010 Express</a></font></p>
+<p style=margin:0in>&nbsp;</p>
+<p style=margin:0in><font face="Arial" size="2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a target="_blank" href="http://www.microsoft.com/en-us/download/details.aspx?id=11800">Windows Driver Kit Version 7.1.0</a></font></p>
+<p style=margin:0in>&nbsp;</p>
+<p style=margin:0in><font face="Arial" size="2">Older versions are not avilable for download any more. If you already have them, you can use them as descibed here.</font></p>
 <p style=margin:0in>&nbsp;</p>
 <p style=margin:0in>&nbsp;</p>
 <p style=margin:0in><b><font face="Arial">
