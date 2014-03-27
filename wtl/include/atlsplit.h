@@ -432,6 +432,7 @@ public:
 		pT->ClientToScreen(&pt);
 		::SetCursorPos(pt.x, pt.y);
 
+		m_xySplitterPosNew = m_xySplitterPos;
 		pT->SetCapture();
 		m_hWndFocusSave = pT->SetFocus();
 		::SetCursor(m_hCursor);
@@ -441,7 +442,6 @@ public:
 			m_cxyDragOffset = x - m_rcSplitter.left - m_xySplitterPos;
 		else
 			m_cxyDragOffset = y - m_rcSplitter.top - m_xySplitterPos;
-		m_xySplitterPosNew = m_xySplitterPos;
 	}
 
 	void SetOrientation(bool bVertical, bool bUpdate = true)
@@ -627,6 +627,7 @@ public:
 		int yPos = GET_Y_LPARAM(lParam);
 		if((::GetCapture() != pT->m_hWnd) && IsOverSplitterBar(xPos, yPos))
 		{
+			m_xySplitterPosNew = m_xySplitterPos;
 			pT->SetCapture();
 			m_hWndFocusSave = pT->SetFocus();
 			::SetCursor(m_hCursor);
@@ -636,7 +637,6 @@ public:
 				m_cxyDragOffset = xPos - m_rcSplitter.left - m_xySplitterPos;
 			else
 				m_cxyDragOffset = yPos - m_rcSplitter.top - m_xySplitterPos;
-			m_xySplitterPosNew = m_xySplitterPos;
 		}
 		else if((::GetCapture() == pT->m_hWnd) && !IsOverSplitterBar(xPos, yPos))
 		{
