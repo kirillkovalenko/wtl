@@ -2791,9 +2791,7 @@ public:
 
 	SIZE GetPaperSize() const
 	{
-		SIZE size;
-		size.cx = m_psd.ptPaperSize.x;
-		size.cy = m_psd.ptPaperSize.y;
+		SIZE size = { m_psd.ptPaperSize.x, m_psd.ptPaperSize.y };
 		return size;
 	}
 
@@ -5125,23 +5123,11 @@ public:
 										(LPWSTR)(((ATL::_DialogSplitHelper::DLGITEMTEMPLATEEX*)pItem) + 1) :
 										(LPWSTR)(pItem + 1);
 								// Get control rect.
-								RECT rect;
-								rect.left = 
-									bDialogEx ? 
-										((ATL::_DialogSplitHelper::DLGITEMTEMPLATEEX*)pItem)->x : 
-										pItem->x;
-								rect.top = 
-									bDialogEx ? 
-										((ATL::_DialogSplitHelper::DLGITEMTEMPLATEEX*)pItem)->y : 
-										pItem->y;
-								rect.right = rect.left + 
-									(bDialogEx ? 
-										((ATL::_DialogSplitHelper::DLGITEMTEMPLATEEX*)pItem)->cx : 
-										pItem->cx);
-								rect.bottom = rect.top + 
-									(bDialogEx ? 
-										((ATL::_DialogSplitHelper::DLGITEMTEMPLATEEX*)pItem)->cy : 
-										pItem->cy);
+								RECT rect = { 0 };
+								rect.left = bDialogEx ? ((ATL::_DialogSplitHelper::DLGITEMTEMPLATEEX*)pItem)->x : pItem->x;
+								rect.top = bDialogEx ? ((ATL::_DialogSplitHelper::DLGITEMTEMPLATEEX*)pItem)->y : pItem->y;
+								rect.right = rect.left + (bDialogEx ? ((ATL::_DialogSplitHelper::DLGITEMTEMPLATEEX*)pItem)->cx : pItem->cx);
+								rect.bottom = rect.top + (bDialogEx ? ((ATL::_DialogSplitHelper::DLGITEMTEMPLATEEX*)pItem)->cy : pItem->cy);
 
 								// Convert from dialog units to screen units
 								MapDialogRect(&rect);

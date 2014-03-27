@@ -701,7 +701,7 @@ public:
 			rbBand.fMask = RBBIM_SIZE;
 			BOOL bRet = (BOOL)::SendMessage(m_hWndToolBar, RB_GETBANDINFO, i, (LPARAM)&rbBand);
 			ATLASSERT(bRet);
-			RECT rect = { 0, 0, 0, 0 };
+			RECT rect = { 0 };
 			::SendMessage(m_hWndToolBar, RB_GETBANDBORDERS, i, (LPARAM)&rect);
 			rbBand.cx += rect.left + rect.right;
 			bRet = (BOOL)::SendMessage(m_hWndToolBar, RB_SETBANDINFO, i, (LPARAM)&rbBand);
@@ -1501,7 +1501,9 @@ public:
 		if(!bRet)
 		{
 			if(uMsg != WM_NCDESTROY)
+			{
 				lRes = pThis->DefWindowProc(uMsg, wParam, lParam);
+			}
 			else
 			{
 				// unsubclass, if needed
@@ -1827,7 +1829,7 @@ public:
 
 		if(!(lpWndPos->flags & SWP_NOSIZE))
 		{
-			RECT rectClient;
+			RECT rectClient = { 0 };
 			if(UpdateClientEdge(&rectClient) && ((GetStyle() & WS_MAXIMIZE) != 0))
 			{
 				::AdjustWindowRectEx(&rectClient, GetStyle(), FALSE, GetExStyle());
@@ -2998,7 +3000,7 @@ public:
 			if(m_arrUIMap[i].m_nID == nID) // matching UI map element
 			{
 				WORD wType = m_arrUIMap[i].m_wType & ~t_wType;
-				if (wType) // has other types 
+				if (wType != 0)   // has other types 
 				{
 					m_arrUIMap[i].m_wType = wType; // keep other types
 					return true;
@@ -3030,7 +3032,7 @@ public:
 				// Add submenu to UI map
 				UIAddMenu(mii.hSubMenu, bSetText);
 			}
-			else if (mii.wID)
+			else if (mii.wID != 0)
 			{
 				// Add element to UI map
 				UIAddElement<UPDUI_MENUPOPUP>(mii.wID);
@@ -3087,7 +3089,8 @@ public:
 		// Add children controls if any
 		for (ATL::CWindow wCtl = ::GetWindow(hWnd, GW_CHILD); wCtl.IsWindow(); wCtl = wCtl.GetWindow(GW_HWNDNEXT))
 		{
-			if (int id = wCtl.GetDlgCtrlID())
+			int id = wCtl.GetDlgCtrlID();
+			if(id != 0)
 				UIAddElement<UPDUI_CHILDWINDOW>(id);
 		}
 
@@ -3430,7 +3433,7 @@ public:
 			}
 			else // one control entry
 			{
-				RECT rectGroup = { 0, 0, 0, 0 };
+				RECT rectGroup = { 0 };
 				pT->DlgResize_PositionControl(cxWidth, cyHeight, rectGroup, m_arrData[i], false);
 			}
 		}
