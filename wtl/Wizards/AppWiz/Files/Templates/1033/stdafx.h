@@ -44,15 +44,14 @@
 
 // Support for VC++ Express & external ATL
 #ifdef _WTL_SUPPORT_EXTERNAL_ATL
+  // for #pragma prefast
+  #ifndef _PREFAST_
+    #pragma warning(disable:4068)
+  #endif
+
   #if (_ATL_VER >= 0x0800)
     // for _stdcallthunk
     #include <atlstdthunk.h>
-
-    // for #pragma prefast
-    #ifndef _PREFAST_
-      #pragma warning(disable:4068)
-    #endif
-
     #pragma comment(lib, "atlthunk.lib")
   #else
     namespace ATL
