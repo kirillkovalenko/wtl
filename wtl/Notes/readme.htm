@@ -5,6 +5,9 @@
 <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
 <title>Windows Template Library</title>
 <style type="text/css">
+html, body {
+	width: 800px;
+}
 .style1 {
 	font-family: Arial;
 	font-weight: bold;
@@ -26,7 +29,7 @@
   <tr>
     <td class="style3">
 	<p style="text-align: left"><font face="Arial"><b>Windows Template Library - WTL Version 9.0</b></font><font face="Arial" size="2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
-	(build 4090) 3/31/2014</font></td>
+	(build 4095) 2014-04-05</font></td>
   </tr>
   <tr>
     <td><hr></td>
@@ -1794,7 +1797,117 @@ and entering 5.01 as a value.</font></p>
 <p style=margin:0in><b><font face="Arial">
 <a name="Changes Between WTL 9.0 And 8.0"></a>Changes Between WTL 9.0 And 8.0</font></b></p>
 <p style=margin:0in>&nbsp;</p>
-  <p style=margin:0in><font face="Arial" size="2">           @@ TODO</font></p>
+  <p style=margin:0in><font face="Arial" size="2">New and improved:</font></p>
+<blockquote style='margin-top:0in;margin-bottom:0in'>
+  <p style=margin:0in><font face="Arial" size="2">
+	Full compatibility with VS2008, VS2010, VS2012, and VS2013<br>
+	New CRegKeyEx class for uniform support for registry<br>
+	New MinCrtHelper functions for uniform support for _ATL_MIN_CRT<br>
+	New DWM classes in atldwm.h<br>
+	New Ribbon classes in atlribbon.h<br>
+	New CDialogBaseUnits class<br>
+	Extended DDX support to TabCtrl, ComboBox, ListBox and ListView selection index<br>
+	Improved font handling in CHyperLink, CPaneContainer, CTabView<br>
+	CHyperlink: Added options for auto-create link font and single-line mode<br>
+	UpdateUI: Added support for radio menu items for popup menus<br>
+	Added support for new VersionHelpers.h in WinSDK 8.1 - GetVersionEx() is now deprecated<br>
+	Improved global support for old SDK headers, and for original headers in VC6 and VC7.x<br>
+	Global support for builds with NOMINMAX defined<br>
+	Global support for builds with STRICT_TYPED_ITEMIDS defined<br>
+	Splitter Window:</font></p>
+	<ul style='margin-top:0in;margin-bottom:0in'>
+		<li><p style=margin:0in><font face="Arial" size="2">Added keyboard handling</font></p></li>
+		<li><p style=margin:0in><font face="Arial" size="2">Added default position for splitter bar</font></p></li>
+		<li><p style=margin:0in><font face="Arial" size="2">Changed orientation from template argument to data member to reduce memory use</font></p></li>
+		<li><p style=margin:0in><font face="Arial" size="2">Added SPLIT_GRADIENTBAR and SPLIT_FIXEDBARSIZE extended styles</font></p></li>
+	</ul>
+	<p style=margin:0in><font face="Arial" size="2">
+	Added CImageListManaged to manage the lifetime of wrapped image list<br>
+	Added Vista standard menu bar look option for Command bar<br>
+	Added new Rich Edit wrappers for _RICHEDIT_VER >= 0x0800<br>
+	Added new Win8 methods to Theme classes<br>
+	CZoomScrollImpl:</font></p>
+	<ul style='margin-top:0in;margin-bottom:0in'>
+		<li><p style=margin:0in><font face="Arial" size="2">Added zoom child windows option</font></p></li>
+		<li><p style=margin:0in><font face="Arial" size="2">Added zoom scale max limit</font></p></li>
+	</ul>
+	<p style=margin:0in><font face="Arial" size="2">
+	AppWizard:</font></p>
+	<ul style='margin-top:0in;margin-bottom:0in'>
+		<li><p style=margin:0in><font face="Arial" size="2">Support for VS2008, VS2010, VS2012, and VS2013</font></p></li>
+		<li><p style=margin:0in><font face="Arial" size="2">New universal setup for all versions of Visual Studio</font></p></li>
+		<li><p style=margin:0in><font face="Arial" size="2">Support for ribbon control</font></p></li>
+	</ul>
+	<p style=margin:0in><font face="Arial" size="2">
+	Updated samples and added VS2005 project files<br>
+	New sample: MTPad7 - demonstrates Ribbon UI</font></p>
+</blockquote>
+  <p style=margin:0in>&nbsp;</p>
+<p style=margin:0in><font face="Arial" size="2">Fixes and enhancements:</font></p>
+  <blockquote style='margin-top:0in;margin-bottom:0in'>
+	<p style=margin:0in><font face="Arial" size="2">General:</font></p>
+	<ul style='margin-top:0in;margin-bottom:0in'>
+		<li><p style=margin:0in><font face="Arial" size="2">Fixed security warning for _vstprintf in atlapp.h</font></p></li>
+		<li><p style=margin:0in><font face="Arial" size="2">Added RunTimeHelper::IsThemeAvailable that detects if themes can be used in the app</font></p></li>
+		<li><p style=margin:0in><font face="Arial" size="2">VS2012: DLL version functions are defined as they are removed from ATL11</font></p></li>
+		<li><p style=margin:0in><font face="Arial" size="2">Added CWndProcThunk initialization for _ATL_VER >= 0x0800</font></p></li>
+		<li><p style=margin:0in><font face="Arial" size="2">Added RunTimeHelper::SizeOf_TOOLINFO() for different Windows versions at runtime</font></p></li>
+		<li><p style=margin:0in><font face="Arial" size="2">Added AtlCreateControlFont()</font></p></li>
+	</ul>
+	<p style=margin:0in>&nbsp;</p>
+	<p style=margin:0in><font face="Arial" size="2">Controls:</font></p>
+	<ul style='margin-top:0in;margin-bottom:0in'>
+		<li><p style=margin:0in><font face="Arial" size="2">Extended CListViewCtrl::SelectItem() to multi-selection list view controls</font></p></li>
+		<li><p style=margin:0in><font face="Arial" size="2">Added another variant of CListViewCtrl::FindItem for strings</font></p></li>
+		<li><p style=margin:0in><font face="Arial" size="2">Added new CToolBarCtrl methods - InsertSeparator() and AddSeparator()</font></p></li>
+		<li><p style=margin:0in><font face="Arial" size="2">Added CToolBarCtrl::GetItemDropDownRect()</font></p></li>
+		<li><p style=margin:0in><font face="Arial" size="2">Added another variant of CToolTipCtrl::TrackActivate()</font></p></li>
+	</ul>
+	<p style=margin:0in>&nbsp;</p>
+	<p style=margin:0in><font face="Arial" size="2">Cracked Handlers:</font></p>
+	<ul style='margin-top:0in;margin-bottom:0in'>
+		<li><p style=margin:0in><font face="Arial" size="2">Fixed handlers with menu arguments</font></p></li>
+		<li><p style=margin:0in><font face="Arial" size="2">Fixed MSG_WM_SYSCOMMAND handler</font></p></li>
+		<li><p style=margin:0in><font face="Arial" size="2">Added MSG_WM_MOUSEHWHEEL handler</font></p></li>
+	</ul>
+	<p style=margin:0in>&nbsp;</p>
+	<p style=margin:0in><font face="Arial" size="2">App Wizard:</font></p>
+	<ul style='margin-top:0in;margin-bottom:0in'>
+		<li><p style=margin:0in><font face="Arial" size="2">Fix for TabView project code generation</font></p></li>
+		<li><p style=margin:0in><font face="Arial" size="2">Improved generated code for VC++ Express to support various versions of ATL</font></p></li>
+		<li><p style=margin:0in><font face="Arial" size="2">Fix for missing UIUpdateChildWindows() in dialog projects</font></p></li>
+	</ul>
+	<p style=margin:0in>&nbsp;</p>
+	<p style=margin:0in><font face="Arial" size="2">App Wizard CE / App Wizard Mobile:</font></p>
+	<ul style='margin-top:0in;margin-bottom:0in'>
+		<li><p style=margin:0in><font face="Arial" size="2">Updated AppWizCE for VS2008 - used different CLSID for Platforms object</font></p></li>
+		<li><p style=margin:0in><font face="Arial" size="2">Fix: VS2008 uses _SECURE_ATL code only</font></p></li>
+		<li><p style=margin:0in><font face="Arial" size="2">Fix for resource creation failure</font></p></li>
+	</ul>
+	<p style=margin:0in>&nbsp;</p>
+	<p style=margin:0in><font face="Arial" size="2">Misc:</font></p>
+	<ul style='margin-top:0in;margin-bottom:0in'>
+		<li><p style=margin:0in><font face="Arial" size="2">Fix: CLogFont uses ::GetDeviceCaps with wrong default hDC = NULL</font></p></li>
+		<li><p style=margin:0in><font face="Arial" size="2">Fixed CPen::GetExtLogPen</font></p></li>
+		<li><p style=margin:0in><font face="Arial" size="2">Fixed CFrameWindowImpl::OnToolTipText*() handlers not to reset text buffer</font></p></li>
+		<li><p style=margin:0in><font face="Arial" size="2">Added support for chevron menus for multi-line toolbars</font></p></li>
+		<li><p style=margin:0in><font face="Arial" size="2">Fix: CFileDialog(false) fails on Windows Mobile 5 or 6</font></p></li>
+		<li><p style=margin:0in><font face="Arial" size="2">Fix: CFolderDialog::SetOKText should use lParam for string</font></p></li>
+		<li><p style=margin:0in><font face="Arial" size="2">Added CFolderDialog::SetPidlRoot()</font></p></li>
+		<li><p style=margin:0in><font face="Arial" size="2">Fixed CMemDlgTemplate::AddControl</font></p></li>
+		<li><p style=margin:0in><font face="Arial" size="2">Added option to disable item dragging in CTabViewImpl</font></p></li>
+		<li><p style=margin:0in><font face="Arial" size="2">Fixed CTabView::ShowTabControl(false) and UpdateLayout() to hide empty space</font></p></li>
+		<li><p style=margin:0in><font face="Arial" size="2">PaneContainer: Added support for vertical title bar text</font></p></li>
+		<li><p style=margin:0in><font face="Arial" size="2">atlsplit.h: Added missing support for WM_PRINTCLIENT</font></p></li>
+		<li><p style=margin:0in><font face="Arial" size="2">Fix: CScrollImpl should not scroll horizontally if not needed</font></p></li>
+		<li><p style=margin:0in><font face="Arial" size="2">Fixed CScrollImpl<T>::ScrollToView() to use offset correctly</font></p></li>
+		<li><p style=margin:0in><font face="Arial" size="2">Fixed CPrintDialogExImpl::GetDefaults()</font></p></li>
+		<li><p style=margin:0in><font face="Arial" size="2">atltheme.h: Added CBufferedAnimation::StopAllAnimations()</font></p></li>
+		<li><p style=margin:0in><font face="Arial" size="2">Added support for I64 format to CString::Format()</font></p></li>
+		<li><p style=margin:0in><font face="Arial" size="2">Fix: CStdIndirectDialogImpl - DLGTEMPLATEEX not supported on Mobile devices</font></p></li>
+		<li><p style=margin:0in><font face="Arial" size="2">Fix: Missing CRichInkCtrlT::SetSel(), added CRichInkCtrlT::Undo()</font></p></li>
+	</ul>
+  </blockquote>
 <p style=margin:0in>&nbsp;</p>
 <p style=margin:0in>&nbsp;</p>
 <p style=margin:0in><b><font face="Arial">
