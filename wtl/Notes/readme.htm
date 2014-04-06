@@ -256,6 +256,10 @@ Windows Mobile 6.0 (Standard and Professional)</font></p>
     sheet and page classes</font></td>
   </tr>
   <tr>
+    <td width="136"><font face="Arial" size="2">&nbsp;&nbsp;&nbsp; atldwm.h</font></td>
+    <td width="358"><font face="Arial" size="2">DWM support classes</font></td>
+  </tr>
+  <tr>
     <td width="136"><font face="Arial" size="2">&nbsp;&nbsp;&nbsp; atlfind.h</font></td>
     <td width="358"><font face="Arial" size="2">Find/Replace support for Edit 
 	and RichEdit</font></td>
@@ -1450,6 +1454,11 @@ Windows Mobile 6.0 (Standard and Professional)</font></p>
     <td colspan="3" width="593"><font face="Arial" size="2"><br>In-memory dialog</font></td>
   </tr>
 	<tr>
+    <td width="221"><b><font face="Arial" size="2">CDialogBaseUnits</font></b></td>
+    <td width="115"><font face="Arial" size="2">helper</font></td>
+    <td width="255"><font face="Arial" size="2">dialog units helper</font></td>
+  </tr>
+	<tr>
     <td width="221"><b><font face="Arial" size="2">CMemDlgTemplate</font></b></td>
     <td width="115"><font face="Arial" size="2">as-is</font></td>
     <td width="255"><font face="Arial" size="2">In-memory dialog template</font></td>
@@ -1471,6 +1480,97 @@ Windows Mobile 6.0 (Standard and Professional)</font></p>
     <td width="221"><b><font face="Arial" size="2">CTaskDialog</font></b></td>
     <td width="115"><font face="Arial" size="2">as-is</font></td>
     <td width="255"><font face="Arial" size="2">&nbsp;</font></td>
+  </tr>
+  <tr>
+    <td colspan="3" width="593"><font face="Arial" size="2"><br>DWM classes</font></td>
+  </tr>
+  <tr>
+    <td width="221"><b><font face="Arial" size="2">CDwm</font></b></td>
+    <td width="115"><font face="Arial" size="2">client</font></td>
+    <td width="255"><font face="Arial" size="2">DWM handle warapper</font></td>
+  </tr>
+  <tr>
+    <td width="221"><b><font face="Arial" size="2">CDwmImpl</font></b></td>
+    <td width="115"><font face="Arial" size="2">impl base</font></td>
+    <td width="255"><font face="Arial" size="2">DWM support</font></td>
+  </tr>
+  <tr>
+    <td width="221"><b><font face="Arial" size="2">CDwmWindow</font></b></td>
+    <td width="115"><font face="Arial" size="2">impl</font></td>
+    <td width="255"><font face="Arial" size="2">DWM window support</font></td>
+  </tr>
+  <tr>
+    <td width="221"><b><font face="Arial" size="2">CDwmThumbnail</font></b></td>
+    <td width="115"><font face="Arial" size="2">client</font></td>
+    <td width="255"><font face="Arial" size="2">DWM thumbnail wrapper</font></td>
+  </tr>
+  <tr>
+    <td width="221"><b><font face="Arial" size="2">CAeroControlImpl</font></b></td>
+    <td width="115"><font face="Arial" size="2">impl</font></td>
+    <td width="255"><font face="Arial" size="2">support for Aero controls</font></td>
+  </tr>
+  <tr>
+    <td colspan="3" width="593"><font face="Arial" size="2"><br>Ribbon classes</font></td>
+  </tr>
+  <tr>
+    <td width="221"><b><font face="Arial" size="2">CRibbonUpdateUI</font></b></td>
+    <td width="115"><font face="Arial" size="2">mi base</font></td>
+    <td width="255"><font face="Arial" size="2">automatic mapping of ribbon UI elements</font></td>
+  </tr>
+  <tr>
+    <td width="221"><b><font face="Arial" size="2">RibbonUI::CtrlImpl</font></b></td>
+    <td width="115"><font face="Arial" size="2">base impl</font></td>
+    <td width="255"><font face="Arial" size="2">base class for all ribbon controls</font></td>
+  </tr>
+  <tr>
+    <td width="221"><b><font face="Arial" size="2">RibbonUI::CommandCtrlImpl</font></b></td>
+    <td width="115"><font face="Arial" size="2">base impl</font></td>
+    <td width="255"><font face="Arial" size="2">base class for ribbon controls</font></td>
+  </tr>
+  <tr>
+    <td width="221"><b><font face="Arial" size="2">RibbonUI::CollectionImplBase</font></b></td>
+    <td width="115"><font face="Arial" size="2">base</font></td>
+    <td width="255"><font face="Arial" size="2">base class for all RibbonUI collections</font></td>
+  </tr>
+  <tr>
+    <td width="221"><b><font face="Arial" size="2">RibbonUI::CollectionImpl</font></b></td>
+    <td width="115"><font face="Arial" size="2">impl</font></td>
+    <td width="255"><font face="Arial" size="2">RibbonUI collections</font></td>
+  </tr>
+  <tr>
+    <td width="221"><b><font face="Arial" size="2">RibbonUI::CollectionCtrlImpl</font></b></td>
+    <td width="115"><font face="Arial" size="2">impl</font></td>
+    <td width="255"><font face="Arial" size="2">specializable class for ribbon collection controls</font></td>
+  </tr>
+  <tr>
+    <td width="221"><b><font face="Arial" size="2">RibbonUI::ToolbarGalleryCtrlImpl</font></b></td>
+    <td width="115"><font face="Arial" size="2">base impl</font></td>
+    <td width="255"><font face="Arial" size="2">base class for ribbon toolbar gallery controls</font></td>
+  </tr>
+  <tr>
+    <td width="221"><b><font face="Arial" size="2">RibbonUI::CRibbonImpl</font></b></td>
+    <td width="115"><font face="Arial" size="2">impl</font></td>
+    <td width="255"><font face="Arial" size="2">Ribbon implementation class</font></td>
+  </tr>
+  <tr>
+    <td width="221"><b><font face="Arial" size="2">CRibbonFrameWindowImplBase</font></b></td>
+    <td width="115"><font face="Arial" size="2">base</font></td>
+    <td width="255"><font face="Arial" size="2">base frame class for Ribbon</font></td>
+  </tr>
+  <tr>
+    <td width="221"><b><font face="Arial" size="2">CRibbonFrameWindowImpl</font></b></td>
+    <td width="115"><font face="Arial" size="2">impl</font></td>
+    <td width="255"><font face="Arial" size="2">Ribbon frame window class</font></td>
+  </tr>
+  <tr>
+    <td width="221"><b><font face="Arial" size="2">CRibbonMDIFrameWindowImpl</font></b></td>
+    <td width="115"><font face="Arial" size="2">impl</font></td>
+    <td width="255"><font face="Arial" size="2">Ribbon MDI frame window class</font></td>
+  </tr>
+  <tr>
+    <td width="221"><b><font face="Arial" size="2">CRibbonPersist</font></b></td>
+    <td width="115"><font face="Arial" size="2">as-is</font></td>
+    <td width="255"><font face="Arial" size="2">Ribbon persistance support</font></td>
   </tr>
   <tr>
     <td colspan="3" width="593"><font face="Arial" size="2"><br>Windows CE support</font></td>
