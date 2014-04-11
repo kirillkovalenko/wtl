@@ -15,7 +15,7 @@
 #define _WIN32_WINNT	0x0501
 #define _WIN32_IE	0x0501
 [!endif]
-#define _RICHEDIT_VER	0x0200
+#define _RICHEDIT_VER	0x0500
 
 [!if WTL_COM_SERVER]
 #define _ATL_APARTMENT_THREADED

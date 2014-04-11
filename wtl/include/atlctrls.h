@@ -7304,12 +7304,18 @@ public:
 // Attributes
 	static LPCTSTR GetWndClassName()
 	{
+#if (_RICHEDIT_VER >= 0x0500)
+		return MSFTEDIT_CLASS;
+#else
 		return RICHEDIT_CLASS;
+#endif
 	}
 
 	static LPCTSTR GetLibraryName()
 	{
-#if (_RICHEDIT_VER >= 0x0200)
+#if (_RICHEDIT_VER >= 0x0500)
+		return _T("MSFTEDIT.DLL");
+#elif (_RICHEDIT_VER >= 0x0200)
 		return _T("RICHED20.DLL");
 #else
 		return _T("RICHED32.DLL");
