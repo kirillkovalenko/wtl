@@ -7280,6 +7280,11 @@ typedef CAnimateCtrlT<ATL::CWindow>   CAnimateCtrl;
   #define RICHEDIT_CLASS	L"RICHEDIT"
 #endif
 
+#if !defined(_UNICODE) && (_RICHEDIT_VER >= 0x0500)
+  #undef MSFTEDIT_CLASS
+  #define MSFTEDIT_CLASS	"RICHEDIT50W"
+#endif
+
 template <class TBase>
 class CRichEditCtrlT : public TBase
 {
