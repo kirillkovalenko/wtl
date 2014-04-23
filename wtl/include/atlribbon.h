@@ -35,8 +35,8 @@
 #endif
 
 #if (_ATL_VER < 0x0700)
-	#include <shlwapi.h>
-	#pragma comment(lib, "shlwapi.lib")
+  #include <shlwapi.h>
+  #pragma comment(lib, "shlwapi.lib")
 #endif
 
 #include <atlmisc.h>    // for RecentDocumentList classes
