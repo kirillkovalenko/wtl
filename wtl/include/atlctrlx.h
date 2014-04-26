@@ -57,12 +57,13 @@ namespace WTL
 #ifndef _WIN32_WCE
 
 // bitmap button extended styles
-#define BMPBTN_HOVER		0x00000001
-#define BMPBTN_AUTO3D_SINGLE	0x00000002
-#define BMPBTN_AUTO3D_DOUBLE	0x00000004
-#define BMPBTN_AUTOSIZE		0x00000008
-#define BMPBTN_SHAREIMAGELISTS	0x00000010
-#define BMPBTN_AUTOFIRE		0x00000020
+#define BMPBTN_HOVER            0x00000001
+#define BMPBTN_AUTO3D_SINGLE    0x00000002
+#define BMPBTN_AUTO3D_DOUBLE    0x00000004
+#define BMPBTN_AUTOSIZE         0x00000008
+#define BMPBTN_SHAREIMAGELISTS  0x00000010
+#define BMPBTN_AUTOFIRE         0x00000020
+#define BMPBTN_AUTOCHECK        0x00000040
 
 template <class T, class TBase = CButton, class TWinTraits = ATL::CControlWinTraits>
 class ATL_NO_VTABLE CBitmapButtonImpl : public ATL::CWindowImpl< T, TBase, TWinTraits >
@@ -99,18 +100,24 @@ public:
 	unsigned m_fMouseOver:1;
 	unsigned m_fFocus:1;
 	unsigned m_fPressed:1;
+	unsigned m_fChecked:1;
 
 
 // Constructor/Destructor
 	CBitmapButtonImpl(DWORD dwExtendedStyle = BMPBTN_AUTOSIZE, HIMAGELIST hImageList = NULL) : 
-			m_ImageList(hImageList), m_dwExtendedStyle(dwExtendedStyle), 
-			m_lpstrToolTipText(NULL),
-			m_fMouseOver(0), m_fFocus(0), m_fPressed(0)
+	                  m_dwExtendedStyle(dwExtendedStyle), m_ImageList(hImageList), 
+	                  m_lpstrToolTipText(NULL),
+	                  m_fMouseOver(0), m_fFocus(0), m_fPressed(0), m_fChecked(0)
 	{
 		m_nImage[_nImageNormal] = -1;
 		m_nImage[_nImagePushed] = -1;
 		m_nImage[_nImageFocusOrHover] = -1;
 		m_nImage[_nImageDisabled] = -1;
+
+#ifdef _DEBUG
+		if((m_dwExtendedStyle & (BMPBTN_AUTOFIRE | BMPBTN_AUTOCHECK)) == (BMPBTN_AUTOFIRE | BMPBTN_AUTOCHECK))
+			ATLTRACE2(atlTraceUI, 0, _T("CBitmapButtonImpl - BMPBTN_AUTOCHECK and BMPBTN_AUTOFIRE cannot be used together, BMPBTN_AUTOFIRE will be ignored.\n"));
+#endif // _DEBUG
 	}
 
 	~CBitmapButtonImpl()
@@ -151,6 +158,12 @@ public:
 			m_dwExtendedStyle = dwExtendedStyle;
 		else
 			m_dwExtendedStyle = (m_dwExtendedStyle & ~dwMask) | (dwExtendedStyle & dwMask);
+
+#ifdef _DEBUG
+		if((m_dwExtendedStyle & (BMPBTN_AUTOFIRE | BMPBTN_AUTOCHECK)) == (BMPBTN_AUTOFIRE | BMPBTN_AUTOCHECK))
+			ATLTRACE2(atlTraceUI, 0, _T("CBitmapButtonImpl::SetBitmapButtonExtendedStyle - BMPBTN_AUTOCHECK and BMPBTN_AUTOFIRE cannot be used together, BMPBTN_AUTOFIRE will be ignored.\n"));
+#endif // _DEBUG
+
 		return dwPrevStyle;
 	}
 
@@ -165,6 +178,7 @@ public:
 		m_ImageList = hImageList;
 		if((m_dwExtendedStyle & BMPBTN_AUTOSIZE) != 0 && ::IsWindow(m_hWnd))
 			SizeToImage();
+
 		return hImageListPrev;
 	}
 
@@ -214,6 +228,22 @@ public:
 		return true;
 	}
 
+	bool GetCheck() const
+	{
+		return (m_fChecked == 1);
+	}
+
+	void SetCheck(bool bCheck, bool bUpdate = true)
+	{
+		m_fChecked = bCheck ? 1 : 0;
+
+		if(bUpdate)
+		{
+			Invalidate();
+			UpdateWindow();
+		}
+	}
+
 // Operations
 	void SetImages(int nNormal, int nPushed = -1, int nFocusOrHover = -1, int nDisabled = -1)
 	{
@@ -248,7 +278,7 @@ public:
 		bool bHover = IsHoverMode();
 		if(!IsWindowEnabled())
 			nImage = m_nImage[_nImageDisabled];
-		else if(m_fPressed == 1)
+		else if((m_fPressed == 1) || (m_fChecked == 1))
 			nImage = m_nImage[_nImagePushed];
 		else if((!bHover && m_fFocus == 1) || (bHover && m_fMouseOver == 1))
 			nImage = m_nImage[_nImageFocusOrHover];
@@ -256,9 +286,9 @@ public:
 			nImage = m_nImage[_nImageNormal];
 
 		// draw the button image
-		int xyPos = 0;
-		if((m_fPressed == 1) && ((m_dwExtendedStyle & (BMPBTN_AUTO3D_SINGLE | BMPBTN_AUTO3D_DOUBLE)) != 0) && (m_nImage[_nImagePushed] == -1))
-			xyPos = 1;
+		int xyPos = (((m_fPressed == 1) || (m_fChecked == 1)) && 
+		             ((m_dwExtendedStyle & (BMPBTN_AUTO3D_SINGLE | BMPBTN_AUTO3D_DOUBLE)) != 0) && 
+		             (m_nImage[_nImagePushed] == -1)) ? 1 : 0;
 		m_ImageList.Draw(dc, nImage, xyPos, xyPos, ILD_NORMAL);
 
 		// draw 3D border if required
@@ -267,12 +297,12 @@ public:
 			RECT rect = { 0 };
 			GetClientRect(&rect);
 
-			if(m_fPressed == 1)
+			if((m_fPressed == 1) || (m_fChecked == 1))
 				dc.DrawEdge(&rect, ((m_dwExtendedStyle & BMPBTN_AUTO3D_SINGLE) != 0) ? BDR_SUNKENOUTER : EDGE_SUNKEN, BF_RECT);
-			else if(!bHover || m_fMouseOver == 1)
+			else if(!bHover || (m_fMouseOver == 1))
 				dc.DrawEdge(&rect, ((m_dwExtendedStyle & BMPBTN_AUTO3D_SINGLE) != 0) ? BDR_RAISEDINNER : EDGE_RAISED, BF_RECT);
 
-			if(!bHover && m_fFocus == 1)
+			if(!bHover && (m_fFocus == 1))
 			{
 				::InflateRect(&rect, -2 * ::GetSystemMetrics(SM_CXEDGE), -2 * ::GetSystemMetrics(SM_CYEDGE));
 				dc.DrawFocusRect(&rect);
@@ -374,7 +404,7 @@ public:
 			Invalidate();
 			UpdateWindow();
 		}
-		if((m_dwExtendedStyle & BMPBTN_AUTOFIRE) != 0)
+		if(((m_dwExtendedStyle & BMPBTN_AUTOFIRE) != 0) && ((m_dwExtendedStyle & BMPBTN_AUTOCHECK) == 0))
 		{
 			int nElapse = 250;
 			int nDelay = 0;
@@ -403,13 +433,16 @@ public:
 
 	LRESULT OnLButtonUp(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& /*bHandled*/)
 	{
+		if(((m_dwExtendedStyle & BMPBTN_AUTOCHECK) != 0) && (m_fPressed == 1))
+			SetCheck(!GetCheck(), false);
+
 		LRESULT lRet = 0;
 		bool bHover = IsHoverMode();
 		if(!bHover)
 			lRet = DefWindowProc(uMsg, wParam, lParam);
 		if(::GetCapture() == m_hWnd)
 		{
-			if(bHover && m_fPressed == 1)
+			if(bHover && (m_fPressed == 1))
 				::SendMessage(GetParent(), WM_COMMAND, MAKEWPARAM(GetDlgCtrlID(), BN_CLICKED), (LPARAM)m_hWnd);
 			::ReleaseCapture();
 		}
@@ -495,6 +528,8 @@ public:
 		if(wParam == VK_SPACE && m_fPressed == 1)
 		{
 			m_fPressed = 0;
+			if((m_dwExtendedStyle & BMPBTN_AUTOCHECK) != 0)
+				SetCheck(!GetCheck(), false);
 			Invalidate();
 			UpdateWindow();
 		}
