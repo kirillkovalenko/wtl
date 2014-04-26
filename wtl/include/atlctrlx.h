@@ -65,7 +65,7 @@ namespace WTL
 #define BMPBTN_AUTOFIRE		0x00000020
 
 template <class T, class TBase = CButton, class TWinTraits = ATL::CControlWinTraits>
-class ATL_NO_VTABLE CBitmapButtonImpl : public ATL::CWindowImpl< T, TBase, TWinTraits>
+class ATL_NO_VTABLE CBitmapButtonImpl : public ATL::CWindowImpl< T, TBase, TWinTraits >
 {
 public:
 	DECLARE_WND_SUPERCLASS(NULL, TBase::GetWndClassName())
@@ -124,13 +124,17 @@ public:
 	BOOL SubclassWindow(HWND hWnd)
 	{
 #if (_MSC_VER >= 1300)
-		BOOL bRet = ATL::CWindowImpl< T, TBase, TWinTraits>::SubclassWindow(hWnd);
+		BOOL bRet = ATL::CWindowImpl< T, TBase, TWinTraits >::SubclassWindow(hWnd);
 #else // !(_MSC_VER >= 1300)
-		typedef ATL::CWindowImpl< T, TBase, TWinTraits>   _baseClass;
+		typedef ATL::CWindowImpl< T, TBase, TWinTraits >   _baseClass;
 		BOOL bRet = _baseClass::SubclassWindow(hWnd);
 #endif // !(_MSC_VER >= 1300)
-		if(bRet)
-			Init();
+		if(bRet != FALSE)
+		{
+			T* pT = static_cast<T*>(this);
+			pT->Init();
+		}
+
 		return bRet;
 	}
 
@@ -301,7 +305,9 @@ public:
 
 	LRESULT OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& bHandled)
 	{
-		Init();
+		T* pT = static_cast<T*>(this);
+		pT->Init();
+
 		bHandled = FALSE;
 		return 1;
 	}
@@ -605,7 +611,7 @@ public:
 typedef CCheckListViewCtrlImplTraits<WS_CHILD | WS_VISIBLE | LVS_REPORT | LVS_SHOWSELALWAYS, WS_EX_CLIENTEDGE, LVS_EX_CHECKBOXES | LVS_EX_FULLROWSELECT>   CCheckListViewCtrlTraits;
 
 template <class T, class TBase = CListViewCtrl, class TWinTraits = CCheckListViewCtrlTraits>
-class ATL_NO_VTABLE CCheckListViewCtrlImpl : public ATL::CWindowImpl<T, TBase, TWinTraits>
+class ATL_NO_VTABLE CCheckListViewCtrlImpl : public ATL::CWindowImpl<T, TBase, TWinTraits >
 {
 public:
 	DECLARE_WND_SUPERCLASS(NULL, TBase::GetWndClassName())
@@ -620,18 +626,17 @@ public:
 	BOOL SubclassWindow(HWND hWnd)
 	{
 #if (_MSC_VER >= 1300)
-		BOOL bRet = ATL::CWindowImplBaseT< TBase, TWinTraits>::SubclassWindow(hWnd);
+		BOOL bRet = ATL::CWindowImpl< T, TBase, TWinTraits >::SubclassWindow(hWnd);
 #else // !(_MSC_VER >= 1300)
-		typedef ATL::CWindowImplBaseT< TBase, TWinTraits>   _baseClass;
+		typedef ATL::CWindowImpl< T, TBase, TWinTraits >   _baseClass;
 		BOOL bRet = _baseClass::SubclassWindow(hWnd);
 #endif // !(_MSC_VER >= 1300)
-		if(bRet)
+		if(bRet != FALSE)
 		{
 			T* pT = static_cast<T*>(this);
-			pT;
-			ATLASSERT((pT->GetExtendedLVStyle() & LVS_EX_CHECKBOXES) != 0);
-			SetExtendedListViewStyle(pT->GetExtendedLVStyle());
+			pT->Init();
 		}
+
 		return bRet;
 	}
 
@@ -660,6 +665,15 @@ public:
 	}
 
 // Implementation
+	void Init()
+	{
+		T* pT = static_cast<T*>(this);
+		pT;   // avoid level 4 warning
+		ATLASSERT((pT->GetExtendedLVStyle() & LVS_EX_CHECKBOXES) != 0);
+		SetExtendedListViewStyle(pT->GetExtendedLVStyle());
+	}
+
+// Message map and handlers
 	BEGIN_MSG_MAP(CCheckListViewCtrlImpl)
 		MESSAGE_HANDLER(WM_CREATE, OnCreate)
 		MESSAGE_HANDLER(WM_LBUTTONDOWN, OnLButtonDown)
@@ -671,10 +685,12 @@ public:
 	{
 		// first let list view control initialize everything
 		LRESULT lRet = DefWindowProc(uMsg, wParam, lParam);
-		T* pT = static_cast<T*>(this);
-		pT;
-		ATLASSERT((pT->GetExtendedLVStyle() & LVS_EX_CHECKBOXES) != 0);
-		SetExtendedListViewStyle(pT->GetExtendedLVStyle());
+		if(lRet == 0)
+		{
+			T* pT = static_cast<T*>(this);
+			pT->Init();
+		}
+
 		return lRet;
 	}
 
@@ -1058,17 +1074,19 @@ public:
 		ATLASSERT(::IsWindow(hWnd));
 		if(m_hFontNormal == NULL)
 			m_hFontNormal = (HFONT)::SendMessage(hWnd, WM_GETFONT, 0, 0L);
+
 #if (_MSC_VER >= 1300)
-		BOOL bRet = ATL::CWindowImpl< T, TBase, TWinTraits>::SubclassWindow(hWnd);
+		BOOL bRet = ATL::CWindowImpl< T, TBase, TWinTraits >::SubclassWindow(hWnd);
 #else // !(_MSC_VER >= 1300)
-		typedef ATL::CWindowImpl< T, TBase, TWinTraits>   _baseClass;
+		typedef ATL::CWindowImpl< T, TBase, TWinTraits >   _baseClass;
 		BOOL bRet = _baseClass::SubclassWindow(hWnd);
 #endif // !(_MSC_VER >= 1300)
-		if(bRet)
+		if(bRet != FALSE)
 		{
 			T* pT = static_cast<T*>(this);
 			pT->Init();
 		}
+
 		return bRet;
 	}
 
@@ -2400,6 +2418,27 @@ public:
 #endif // !(_MSC_VER >= 1300)
 	}
 
+	BOOL SubclassWindow(HWND hWnd)
+	{
+#if (_MSC_VER >= 1300)
+		BOOL bRet = ATL::CWindowImpl< T, TBase, TWinTraits >::SubclassWindow(hWnd);
+#else // !(_MSC_VER >= 1300)
+		typedef ATL::CWindowImpl< T, TBase, TWinTraits >   _baseClass;
+		BOOL bRet = _baseClass::SubclassWindow(hWnd);
+#endif // !(_MSC_VER >= 1300)
+		if(bRet != FALSE)
+		{
+			T* pT = static_cast<T*>(this);
+			pT->Init();
+
+			RECT rect = { 0 };
+			GetClientRect(&rect);
+			pT->UpdateLayout(rect.right, rect.bottom);
+		}
+
+		return bRet;
+	}
+
 	BOOL EnableCloseButton(BOOL bEnable)
 	{
 		ATLASSERT(::IsWindow(m_hWnd));
@@ -2436,32 +2475,8 @@ public:
 
 	LRESULT OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
 	{
-		if(m_hFont == NULL)
-		{
-			// The same as AtlCreateControlFont() for horizontal pane
-#ifndef _WIN32_WCE
-			LOGFONT lf = { 0 };
-			ATLVERIFY(::SystemParametersInfo(SPI_GETICONTITLELOGFONT, sizeof(LOGFONT), &lf, 0) != FALSE);
-			if(IsVertical())
-				lf.lfEscapement = 900;   // 90 degrees
-			m_hFont = ::CreateFontIndirect(&lf);
-#else // CE specific
-			m_hFont = (HFONT)::GetStockObject(SYSTEM_FONT);
-			if(IsVertical())
-			{
-				CLogFont lf(m_hFont);
-				lf.lfEscapement = 900;   // 90 degrees
-				m_hFont = ::CreateFontIndirect(&lf);
-			}
-#endif // _WIN32_WCE
-			m_bInternalFont = true;
-		}
-
 		T* pT = static_cast<T*>(this);
-		pT->CalcSize();
-
-		if((m_dwExtendedStyle & PANECNT_NOCLOSEBUTTON) == 0)
-			pT->CreateCloseButton();
+		pT->Init();
 
 		return 0;
 	}
@@ -2641,6 +2656,36 @@ public:
 	}
 
 // Implementation - overrideable methods
+	void Init()
+	{
+		if(m_hFont == NULL)
+		{
+			// The same as AtlCreateControlFont() for horizontal pane
+#ifndef _WIN32_WCE
+			LOGFONT lf = { 0 };
+			ATLVERIFY(::SystemParametersInfo(SPI_GETICONTITLELOGFONT, sizeof(LOGFONT), &lf, 0) != FALSE);
+			if(IsVertical())
+				lf.lfEscapement = 900;   // 90 degrees
+			m_hFont = ::CreateFontIndirect(&lf);
+#else // CE specific
+			m_hFont = (HFONT)::GetStockObject(SYSTEM_FONT);
+			if(IsVertical())
+			{
+				CLogFont lf(m_hFont);
+				lf.lfEscapement = 900;   // 90 degrees
+				m_hFont = ::CreateFontIndirect(&lf);
+			}
+#endif // _WIN32_WCE
+			m_bInternalFont = true;
+		}
+
+		T* pT = static_cast<T*>(this);
+		pT->CalcSize();
+
+		if((m_dwExtendedStyle & PANECNT_NOCLOSEBUTTON) == 0)
+			pT->CreateCloseButton();
+	}
+
 	void UpdateLayout(int cxWidth, int cyHeight)
 	{
 		ATLASSERT(::IsWindow(m_hWnd));
@@ -3740,7 +3785,7 @@ typedef TBVCONTEXTMENUINFO* LPTBVCONTEXTMENUINFO;
 
 
 template <class T, class TBase = ATL::CWindow, class TWinTraits = ATL::CControlWinTraits>
-class ATL_NO_VTABLE CTabViewImpl : public ATL::CWindowImpl<T, TBase, TWinTraits>
+class ATL_NO_VTABLE CTabViewImpl : public ATL::CWindowImpl< T, TBase, TWinTraits >
 {
 public:
 	DECLARE_WND_CLASS_EX(NULL, 0, COLOR_APPWORKSPACE)
@@ -4369,6 +4414,24 @@ public:
 		// Add "Windows..." menu item
 		if(bWindowsMenuItem)
 			menu.AppendMenu(MF_BYPOSITION | MF_STRING, ID_WINDOW_SHOWTABLIST, pT->GetWindowsMenuItemText());
+	}
+
+	BOOL SubclassWindow(HWND hWnd)
+	{
+#if (_MSC_VER >= 1300)
+		BOOL bRet = ATL::CWindowImpl< T, TBase, TWinTraits >::SubclassWindow(hWnd);
+#else // !(_MSC_VER >= 1300)
+		typedef ATL::CWindowImpl< T, TBase, TWinTraits >   _baseClass;
+		BOOL bRet = _baseClass::SubclassWindow(hWnd);
+#endif // !(_MSC_VER >= 1300)
+		if(bRet != FALSE)
+		{
+			T* pT = static_cast<T*>(this);
+			pT->CreateTabControl();
+			pT->UpdateLayout();
+		}
+
+		return bRet;
 	}
 
 // Message map and handlers
