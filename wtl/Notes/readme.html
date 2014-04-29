@@ -29,7 +29,7 @@ html, body {
   <tr>
     <td class="style3">
 	<p style="text-align: left"><font face="Arial"><b>Windows Template Library - WTL Version 9.0</b></font><font face="Arial" size="2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
-	(build 4095) 2014-04-05</font></td>
+	(build 4119) 2014-04-29</font></td>
   </tr>
   <tr>
     <td><hr></td>
@@ -1909,6 +1909,7 @@ and entering 5.01 as a value.</font></p>
 	Extended DDX support to TabCtrl, ComboBox, ListBox and ListView selection index<br>
 	Improved font handling in CHyperLink, CPaneContainer, CTabView<br>
 	CHyperlink: Added options for auto-create link font and single-line mode<br>
+	CBitmapButtonImpl: Added checked state, GetCheck()/SetCheck(), and BMPBTN_AUTOCHECK<br>
 	UpdateUI: Added support for radio menu items for popup menus<br>
 	Added support for new VersionHelpers.h in WinSDK 8.1 - GetVersionEx() is now deprecated<br>
 	Improved global support for old SDK headers, and for original headers in VC6 and VC7.x<br>
@@ -1926,6 +1927,7 @@ and entering 5.01 as a value.</font></p>
 	Added Vista standard menu bar look option for Command bar<br>
 	Added new Rich Edit wrappers for _RICHEDIT_VER >= 0x0800<br>
 	Added new Win8 methods to Theme classes<br>
+	Added override of SubclassWindow() to CSplitterWindowImpl, CPaneContainerImpl, and CTabViewImpl<br>
 	CZoomScrollImpl:</font></p>
 	<ul style='margin-top:0in;margin-bottom:0in'>
 		<li><p style=margin:0in><font face="Arial" size="2">Added zoom child windows option</font></p></li>
@@ -1997,6 +1999,7 @@ and entering 5.01 as a value.</font></p>
 		<li><p style=margin:0in><font face="Arial" size="2">Fixed CMemDlgTemplate::AddControl</font></p></li>
 		<li><p style=margin:0in><font face="Arial" size="2">Added option to disable item dragging in CTabViewImpl</font></p></li>
 		<li><p style=margin:0in><font face="Arial" size="2">Fixed CTabView::ShowTabControl(false) and UpdateLayout() to hide empty space</font></p></li>
+		<li><p style=margin:0in><font face="Arial" size="2">CTabView: Fixed value of the active page when inserting pages before it</font></p></li>
 		<li><p style=margin:0in><font face="Arial" size="2">PaneContainer: Added support for vertical title bar text</font></p></li>
 		<li><p style=margin:0in><font face="Arial" size="2">atlsplit.h: Added missing support for WM_PRINTCLIENT</font></p></li>
 		<li><p style=margin:0in><font face="Arial" size="2">Fix: CScrollImpl should not scroll horizontally if not needed</font></p></li>
