@@ -1162,6 +1162,39 @@ namespace MinCrtHelper
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// GenericWndClass - generic window class usable for subclassing
+
+// Use in dialog templates to specify a placeholder to be subclassed
+// Specify as a custom control with class name WTL_GenericWindow
+// Call Rregister() before creating dialog (for example, in WinMain)
+namespace GenericWndClass
+{
+	inline LPCTSTR GetName()
+	{
+		return _T("WTL_GenericWindow");
+	}
+
+	inline ATOM Register()
+	{
+		WNDCLASSEX wc = { sizeof(WNDCLASSEX) };
+		wc.lpfnWndProc = ::DefWindowProc;
+		wc.hInstance = ModuleHelper::GetModuleInstance();
+		wc.hCursor = ::LoadCursor(NULL, IDC_ARROW);
+		wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+		wc.lpszClassName = GetName();
+		ATOM atom = ::RegisterClassEx(&wc);
+		ATLASSERT(atom != 0);
+		return atom;
+	}
+
+	inline BOOL Unregister()   // only needed for DLLs or tmp use
+	{
+		return ::UnregisterClass(GetName(), ModuleHelper::GetModuleInstance());
+	}
+}; // namespace GenericWndClass
+
+
+///////////////////////////////////////////////////////////////////////////////
 // CMessageFilter - Interface for message filter support
 
 class CMessageFilter
