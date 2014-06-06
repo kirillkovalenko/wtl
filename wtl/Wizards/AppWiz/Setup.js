@@ -16,8 +16,9 @@ main();
 function main()
 {
 	// Decode command line arguments
-	var bDebug = false;
-	var bElevated = false;
+	var bDebug     = false;
+	var bElevated  = false;
+	var strVersion = "";
 	var Args = WScript.Arguments;
 	for(var i = 0; i < Args.length; i++)
 	{
@@ -25,6 +26,8 @@ function main()
 			bDebug = true;
 		else if(Args(i) == "/elevated")
 			bElevated = true;
+		else if(Args(i).substr(0, 5) == "/ver:")
+			strVersion = Args(i).substr(5);
 	}
 
 	// See if UAC is enabled
@@ -40,8 +43,10 @@ function main()
 		
 		// Now relaunch the script, using the "RunAs" verb to elevate
 		var strParams = "\"" + WScript.ScriptFullName + "\"";
-		if (bDebug)
+		if(bDebug)
 			strParams += " /debug";
+		if(strVersion)
+			strParams += " /ver:" + strVersion;
 		strParams += " /elevated";
 		Shell.ShellExecute(WScript.FullName, strParams, null, "RunAs");
 		return;
@@ -67,8 +72,11 @@ function main()
 		return;
 	}
 
-	MessageBox(WSShell, "Setup will search for installed versions of Visual Studio,\nand ask to add the WTL App Wizard for each of them.");
-
+	if(!strVersion) 
+	{
+		MessageBox(WSShell, "Setup will search for installed versions of Visual Studio,\nand ask to add the WTL App Wizard for each of them.");
+	}
+	
 	var strRegKey_32 = "HKLM\\Software\\";
 	var strRegKey_64 = "HKLM\\Software\\Wow6432Node\\";
 
@@ -101,6 +109,20 @@ function main()
 	astrFolder[9] = "Express\\vcprojects";
 	astrFolder[10] = "vcprojects_WDExpress";
 	astrFolder[11] = "vcprojects_WDExpress";
+
+	var astrDataFolder = new Array();
+	astrDataFolder[0] = "VCWizards";
+	astrDataFolder[1] = "VCWizards";
+	astrDataFolder[2] = "VCWizards";
+	astrDataFolder[3] = "VCWizards";
+	astrDataFolder[4] = "VCWizards";
+	astrDataFolder[5] = "VCWizards";
+	astrDataFolder[6] = "VCWizards";
+	astrDataFolder[7] = "VCWizards";
+	astrDataFolder[8] = "VCWizards";
+	astrDataFolder[9] = "VCWizards";
+	astrDataFolder[10] = "VCWizards";
+	astrDataFolder[11] = "VCWizards";
 
 	var astrVersions = new Array();
 	astrVersions[0] = "Visual Studio 2002 (7.0)";
@@ -144,6 +166,13 @@ function main()
 	astrWizVer[10] = "11.0";
 	astrWizVer[11] = "12.0";
 
+	var astrParamVer = new Array();
+	astrParamVer[4] = "10";
+	astrParamVer[5] = "11";
+	astrParamVer[6] = "12";
+	astrParamVer[10] = "11E";
+	astrParamVer[11] = "12E";
+
 	var nSpecial = 4;
 
 	var nWizSpecial = 0;
@@ -151,6 +180,9 @@ function main()
 	var bFound = false;
 	for(var i = 0; i < nVersions; i++)
 	{
+		if(strVersion && strVersion != astrParamVer[i])
+			continue;
+		
 		if(bDebug)
 			WScript.Echo("Looking for: " + astrVersions[i]);
 
@@ -178,6 +210,12 @@ function main()
 		if(!FileSys.FolderExists(strDestFolder))
 			continue;
 
+		var strDataDestFolder = FileSys.BuildPath(strValue, astrDataFolder[i]);
+		if(bDebug)
+			WScript.Echo("Data Destination: " + strDataDestFolder);
+		if(!FileSys.FolderExists(strDataDestFolder))
+			continue;
+
 		if(i == nSpecial)   // special case for VS2010
 		{
 			var strCheckFile = FileSys.BuildPath(strDestFolder, "vc.vsdir");
@@ -186,19 +224,26 @@ function main()
 		}
 
 		bFound = true;
-		var strMsg = "Found: " + astrVersions[i] + "\n\nInstall WTL App Wizard?";
-		var bRet = MessageBox(WSShell, strMsg, true);
+		var bRet = true;
+		if(!strVersion) 
+		{
+			var strMsg = "Found: " + astrVersions[i] + "\n\nInstall WTL App Wizard?";
+			bRet = MessageBox(WSShell, strMsg, true);
+		}
 		if(bRet)
 		{
 			var bWizSpecial = (i == nWizSpecial);   // special case for VS2002
-			SetupWizard(WSShell, FileSys, strSourceFolder, strDestFolder, astrWizVer[i], bWizSpecial, abExpress[i], bDebug);
+			SetupWizard(WSShell, FileSys, strSourceFolder, strDestFolder, strDataDestFolder, astrWizVer[i], bWizSpecial, abExpress[i], bDebug);
 		}
 	}
 
-	if(bFound)
-		MessageBox(WSShell, "Done!");
-	else
-		MessageBox(WSShell, "Setup could not find Visual Studio installed");
+	if(!strVersion)
+	{
+		if(bFound)
+			MessageBox(WSShell, "Done!");
+		else
+			MessageBox(WSShell, "Setup could not find Visual Studio installed");
+	}
 }
 
 function MessageBox(WSShell, strText, bYesNo)
@@ -208,7 +253,7 @@ function MessageBox(WSShell, strText, bYesNo)
 	return (nRetBtn == 6);   // 6 = Yes;
 }
 
-function SetupWizard(WSShell, FileSys, strSourceFolder, strDestFolder, strWizVer, bWizSpecial, bExpress, bDebug)
+function SetupWizard(WSShell, FileSys, strSourceFolder, strDestFolder, strDataDestFolder, strWizVer, bWizSpecial, bExpress, bDebug)
 {
 	// Copy files
 	try
@@ -220,6 +265,9 @@ function SetupWizard(WSShell, FileSys, strSourceFolder, strDestFolder, strWizVer
 		strSrc = FileSys.BuildPath(strSourceFolder, "WTLAppWiz.vsdir");
 		strDest = FileSys.BuildPath(strDestFolder, "WTLAppWiz.vsdir");
 		FileSys.CopyFile(strSrc, strDest);
+
+		strDataDestFolder = FileSys.BuildPath(strDataDestFolder, "AppWiz\\WTL");
+		FileSys.CopyFolder(strSourceFolder, strDataDestFolder, true);
 	}
 	catch(e)
 	{
@@ -260,7 +308,7 @@ function SetupWizard(WSShell, FileSys, strSourceFolder, strDestFolder, strWizVer
 			else if(strLine.indexOf("WIZARD_VERSION") != -1)
 				strLine = "Param=\"WIZARD_VERSION = " + strWizVer + "\"";
 			else if(strLine.indexOf("ABSOLUTE_PATH") != -1)
-				strLine = "Param=\"ABSOLUTE_PATH = " + strSourceFolder + "\"";
+				strLine = "Param=\"ABSOLUTE_PATH = " + strDataDestFolder + "\"";
 			fileDest.WriteLine(strLine);
 		}
 
