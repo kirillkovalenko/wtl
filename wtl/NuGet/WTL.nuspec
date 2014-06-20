@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
     <metadata>
-        <id>WindowsTemplateLibrary</id>
+        <id>wtl</id>
         <version>9.0.4140</version>
         <title>Windows Template Library</title>
         <authors>Tsuda Kageyu,WTL Team</authors>
@@ -17,7 +17,7 @@
         <tags>C++ Native Win32 GUI Window Microsoft</tags>
     </metadata>
     <files>
-        <file src="build\native\WindowsTemplateLibrary.targets" target="build\native\WindowsTemplateLibrary.targets" />
+        <file src="build\native\wtl.targets" target="build\native\wtl.targets" />
         <file src="..\Include\atlapp.h" target="lib\native\include\atlapp.h" />
         <file src="..\Include\atlcrack.h" target="lib\native\include\atlcrack.h" />
         <file src="..\Include\atlctrls.h" target="lib\native\include\atlctrls.h" />

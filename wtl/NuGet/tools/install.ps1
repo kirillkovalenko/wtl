@@ -94,7 +94,7 @@ try {
 
     # Install the AppWizard only for current VS version.
 
-    Start-Process wscript.exe ("$toolsPath\AppWiz\setup.js", $jsParam) -Wait;
+    Start-Process wscript.exe ("""$toolsPath\AppWiz\setup.js""", $jsParam) -Wait;
 }
 finally {
     $mutex.ReleaseMutex();

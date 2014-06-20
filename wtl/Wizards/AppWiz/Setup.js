@@ -16,9 +16,10 @@ main();
 function main()
 {
 	// Decode command line arguments
-	var bDebug     = false;
-	var bElevated  = false;
+	var bDebug = false;
+	var bElevated = false;
 	var strVersion = "";
+
 	var Args = WScript.Arguments;
 	for(var i = 0; i < Args.length; i++)
 	{
@@ -73,9 +74,7 @@ function main()
 	}
 
 	if(!strVersion) 
-	{
 		MessageBox(WSShell, "Setup will search for installed versions of Visual Studio,\nand ask to add the WTL App Wizard for each of them.");
-	}
 	
 	var strRegKey_32 = "HKLM\\Software\\";
 	var strRegKey_64 = "HKLM\\Software\\Wow6432Node\\";
@@ -109,20 +108,6 @@ function main()
 	astrFolder[9] = "Express\\vcprojects";
 	astrFolder[10] = "vcprojects_WDExpress";
 	astrFolder[11] = "vcprojects_WDExpress";
-
-	var astrDataFolder = new Array();
-	astrDataFolder[0] = "VCWizards";
-	astrDataFolder[1] = "VCWizards";
-	astrDataFolder[2] = "VCWizards";
-	astrDataFolder[3] = "VCWizards";
-	astrDataFolder[4] = "VCWizards";
-	astrDataFolder[5] = "VCWizards";
-	astrDataFolder[6] = "VCWizards";
-	astrDataFolder[7] = "VCWizards";
-	astrDataFolder[8] = "VCWizards";
-	astrDataFolder[9] = "VCWizards";
-	astrDataFolder[10] = "VCWizards";
-	astrDataFolder[11] = "VCWizards";
 
 	var astrVersions = new Array();
 	astrVersions[0] = "Visual Studio 2002 (7.0)";
@@ -180,9 +165,9 @@ function main()
 	var bFound = false;
 	for(var i = 0; i < nVersions; i++)
 	{
-		if(strVersion && strVersion != astrParamVer[i])
+		if(strVersion && (strVersion != astrParamVer[i]))
 			continue;
-		
+
 		if(bDebug)
 			WScript.Echo("Looking for: " + astrVersions[i]);
 
@@ -210,7 +195,7 @@ function main()
 		if(!FileSys.FolderExists(strDestFolder))
 			continue;
 
-		var strDataDestFolder = FileSys.BuildPath(strValue, astrDataFolder[i]);
+		var strDataDestFolder = FileSys.BuildPath(strValue, "VCWizards");
 		if(bDebug)
 			WScript.Echo("Data Destination: " + strDataDestFolder);
 		if(!FileSys.FolderExists(strDataDestFolder))
