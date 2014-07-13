@@ -860,38 +860,17 @@ public:
 				if ((ovi.dwMajorVersion == 5 && ovi.dwMinorVersion >= 1) || (ovi.dwMajorVersion > 5))
 #endif // _versionhelpers_H_INCLUDED_
 				{
-					// We use DLLVERSIONINFO_private so we don't have to depend on shlwapi.h
-					typedef struct _DLLVERSIONINFO_private
+					DWORD dwMajor = 0, dwMinor = 0;
+					HRESULT hRet = ATL::AtlGetCommCtrlVersion(&dwMajor, &dwMinor);
+					if(SUCCEEDED(hRet))
 					{
-						DWORD cbSize;
-						DWORD dwMajorVersion;
-						DWORD dwMinorVersion;
-						DWORD dwBuildNumber;
-						DWORD dwPlatformID;
-					} DLLVERSIONINFO_private;
-
-					HMODULE hModule = ::LoadLibrary("comctl32.dll");
-					if(hModule != NULL)
-					{
-						typedef HRESULT (CALLBACK *LPFN_DllGetVersion)(DLLVERSIONINFO_private *);
-						LPFN_DllGetVersion fnDllGetVersion = (LPFN_DllGetVersion)::GetProcAddress(hModule, "DllGetVersion");
-						if(fnDllGetVersion != NULL)
+						if(dwMajor >= 6)
 						{
-							DLLVERSIONINFO_private version = { sizeof(DLLVERSIONINFO_private) };
-							if(SUCCEEDED(fnDllGetVersion(&version)))
-							{
-								if(version.dwMajorVersion >= 6)
-								{
-									pThisNoConst->m_bShadowBufferNeeded = TRUE;
+							pThisNoConst->m_bShadowBufferNeeded = TRUE;
 
-									ATLTRACE2(atlTraceUI, 0, _T("Warning: You have compiled for MBCS/ANSI but are using common controls version 6 or later (likely through a manifest file).\r\n"));
-									ATLTRACE2(atlTraceUI, 0, _T("If you use common controls version 6 or later, you should only do so for UNICODE builds.\r\n"));
-								}
-							}
+							ATLTRACE2(atlTraceUI, 0, _T("Warning: You have compiled for MBCS/ANSI but are using common controls version 6 or later (likely through a manifest file).\r\n"));
+							ATLTRACE2(atlTraceUI, 0, _T("If you use common controls version 6 or later, you should only do so for UNICODE builds.\r\n"));
 						}
-
-						::FreeLibrary(hModule);
-						hModule = NULL;
 					}
 				}
 #endif // !_UNICODE
