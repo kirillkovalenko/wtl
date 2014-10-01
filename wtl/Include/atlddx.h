@@ -44,8 +44,8 @@ namespace WTL
 #define BEGIN_DDX_MAP(thisClass) \
 	BOOL DoDataExchange(BOOL bSaveAndValidate = FALSE, UINT nCtlID = (UINT)-1) \
 	{ \
-		bSaveAndValidate; \
-		nCtlID;
+		(bSaveAndValidate); \
+		(nCtlID);
 
 #define DDX_TEXT(nID, var) \
 		if(nCtlID == (UINT)-1 || nCtlID == nID) \
