@@ -230,7 +230,7 @@ public:
 		}
 		else
 		{
-			ATLASSERT(!bValidate || lstrlen(lpstrText) <= nLength);
+			ATLASSERT(!bValidate || (lstrlen(lpstrText) <= nLength));
 			bSuccess = pT->SetDlgItemText(nID, lpstrText);
 		}
 
@@ -266,7 +266,7 @@ public:
 		{
 			USES_CONVERSION;
 			LPTSTR lpstrText = OLE2T(bstrText);
-			ATLASSERT(!bValidate || lstrlen(lpstrText) <= nLength);
+			ATLASSERT(!bValidate || (lstrlen(lpstrText) <= nLength));
 			bSuccess = pT->SetDlgItemText(nID, lpstrText);
 		}
 
@@ -302,7 +302,7 @@ public:
 		{
 			USES_CONVERSION;
 			LPTSTR lpstrText = OLE2T(bstrText);
-			ATLASSERT(!bValidate || lstrlen(lpstrText) <= nLength);
+			ATLASSERT(!bValidate || (lstrlen(lpstrText) <= nLength));
 			bSuccess = pT->SetDlgItemText(nID, lpstrText);
 		}
 
@@ -383,7 +383,7 @@ public:
 		}
 		else
 		{
-			ATLASSERT(!bValidate || nVal >= nMin && nVal <= nMax);
+			ATLASSERT(!bValidate || (nVal >= nMin && nVal <= nMax));
 			bSuccess = pT->SetDlgItemInt(nID, nVal, bSigned);
 		}
 
@@ -446,7 +446,7 @@ public:
 		}
 		else
 		{
-			ATLASSERT(!bValidate || nVal >= nMin && nVal <= nMax);
+			ATLASSERT(!bValidate || (nVal >= nMin && nVal <= nMax));
 			SecureHelper::sprintf_x(szBuff, cchBuff, _T("%.*g"), nPrecision, nVal);
 			bSuccess = pT->SetDlgItemText(nID, szBuff);
 		}
@@ -489,7 +489,7 @@ public:
 		}
 		else
 		{
-			ATLASSERT(!bValidate || nVal >= nMin && nVal <= nMax);
+			ATLASSERT(!bValidate || (nVal >= nMin && nVal <= nMax));
 			SecureHelper::sprintf_x(szBuff, cchBuff, _T("%.*g"), nPrecision, nVal);
 			bSuccess = pT->SetDlgItemText(nID, szBuff);
 		}

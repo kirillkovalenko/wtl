@@ -296,7 +296,7 @@ public:
 	{
 		ATLASSERT((nPane == SPLIT_PANE_LEFT) || (nPane == SPLIT_PANE_RIGHT));
 		if((nPane != SPLIT_PANE_LEFT) && (nPane != SPLIT_PANE_RIGHT))
-			return false;
+			return NULL;
 
 		return m_hWndPane[nPane];
 	}
