@@ -2371,7 +2371,8 @@ public:
 	void DrawMenuText(CDCHandle& dc, RECT& rc, LPCTSTR lpstrText, COLORREF color)
 	{
 		int nTab = -1;
-		for(int i = 0; i < lstrlen(lpstrText); i++)
+		const int nLen = lstrlen(lpstrText);
+		for(int i = 0; i < nLen; i++)
 		{
 			if(lpstrText[i] == _T('\t'))
 			{
