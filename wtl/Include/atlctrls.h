@@ -1885,8 +1885,6 @@ public:
 
 	void Attach(HIMAGELIST hImageList)
 	{
-		ATLASSERT(m_hImageList == NULL);
-		ATLASSERT(hImageList != NULL);
 		if(t_bManaged && (m_hImageList != NULL) && (m_hImageList != hImageList))
 			ImageList_Destroy(m_hImageList);
 		m_hImageList = hImageList;
