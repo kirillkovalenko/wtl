@@ -13,9 +13,6 @@
 #define _WIN32_IE	0x0500
 #define _RICHEDIT_VER	0x0100
 
-#include <shlobj.h>
-#include <shlguid.h>
-
 #include <atlbase.h>
 #include <atlapp.h>
 
