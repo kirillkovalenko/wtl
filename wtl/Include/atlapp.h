@@ -1179,7 +1179,7 @@ namespace GenericWndClass
 #ifndef _WIN32_WCE
 		WNDCLASSEX wc = { sizeof(WNDCLASSEX) };
 #else
-		WNDCLASS wc = { sizeof(WNDCLASS) };
+		WNDCLASS wc = { 0 };
 #endif
 		wc.lpfnWndProc = ::DefWindowProc;
 		wc.hInstance = ModuleHelper::GetModuleInstance();
